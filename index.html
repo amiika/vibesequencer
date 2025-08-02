@@ -1,93 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VibeSeq</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
     <div id="menu">
-        <div class="menu-item" id="title"><img src="vibe.png" width="80"/></div>
+        <div class="menu-item" id="title">VibeSeq</div>
         <button class="menu-item" id="play-button">Play</button>
-        <button class="menu-item" id="follow-button" style="display: none;">Unfollow</button>
-        <!-- Removed BPM input from top menu -->
+        <div class="menu-item">
+            <div>BPM: <input type="number" id="tempo" value="120" min="60" max="200"></div>
+        </div>
         <div class="right-menu">
             <button class="menu-item" id="help-button">Help</button>
             <button class="menu-item" id="midi-button">Settings</button>
-            <button class="menu-item" id="import-button">Import</button>
             <button class="menu-item" id="json-button">Export</button>
         </div>
     </div>
-
     <div id="context-menu">
-        <!-- Context Menu Tabs - Section moved to first position -->
+        <!-- Context Menu Tabs -->
         <div class="context-tabs">
-            <div class="context-tab active" data-tab="section">Section</div>
-            <div class="context-tab" data-tab="rhythm">Rhythm</div>
+            <div class="context-tab active" data-tab="rhythm">Rhythm</div>
             <div class="context-tab" data-tab="melody">Melody</div>
         </div>
-
+        
         <!-- Context Menu Content -->
         <div class="context-content">
             <!-- Selection Title -->
             <div class="context-section title" id="selection-title">
                 <span id="selection-title-text">No Selection</span>
             </div>
-
- <div class="context-tab-panel active" id="section-panel">
-    <div class="context-row">
-        <div class="context-section">
-            <span class="context-label">Name:</span>
-            <input type="text" class="param-input section-name-control" id="section-name-input"
-                placeholder="Section Name" style="width: 120px;">
-        </div>
-
-        <div class="context-section">
-            <span class="context-label">Repeat:</span>
-            <input type="number" class="param-input section-repeat-control" id="section-repeat-input"
-                min="1" max="99" value="1" style="width: 60px;">
-        </div>
-    </div>
-
-    <div class="context-row">
-        <div class="context-section">
-            <span class="context-label">BPM:</span>
-            <input type="number" class="param-input section-bpm-control" id="section-bpm-input" min="60"
-                max="200" value="120" style="width: 70px;">
-        </div>
-
-        <div class="context-section">
-            <button class="operation-button clone-section" id="clone-section-button">Clone Section</button>
-            <button class="operation-button clone-track-button" id="clone-track-button" disabled>Clone Track</button>
-            <button class="clear-section-button" id="clear-section-button">Clear Section</button>
-            <button class="clear-all-button" id="clear-all-button">Clear All</button>
-        </div>
-    </div>
-</div>
-            <!-- Rhythm Tab Panel - No longer active by default -->
-            <div class="context-tab-panel" id="rhythm-panel">
+            
+            <!-- Rhythm Tab Panel -->
+            <div class="context-tab-panel active" id="rhythm-panel">
                 <div class="context-row">
-                    <div class="context-section" id="velocity-section">
-                        <span class="context-label">Velocity:</span>
-                        <input type="number" class="param-input" id="velocity-input" min="1" max="127" value="100">
-                    </div>
-
                     <div class="context-section" id="mod-section">
                         <span class="context-label">Mod:</span>
                         <input type="number" class="param-input" id="mod-input" min="1" max="32" placeholder="1">
                     </div>
-
+                    
                     <div class="context-section" id="odds-section">
                         <span class="context-label">Odds:</span>
-                        <input type="number" class="param-input" id="odds-input" min="0" max="1" step="0.1"
-                            placeholder="1.0">
+                        <input type="number" class="param-input" id="odds-input" min="0" max="1" step="0.1" placeholder="1.0">
                     </div>
                 </div>
-
+                
                 <div class="context-row">
                     <div class="context-section" id="operations-section">
                         <span class="context-label">Operations:</span>
@@ -99,7 +58,7 @@
                         <button class="operation-button" id="clear-button">Clear</button>
                     </div>
                 </div>
-
+                
                 <div class="context-row" id="subdivision-controls" style="display: none;">
                     <div class="context-section">
                         <span class="context-label">Subdivide:</span>
@@ -116,7 +75,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Melody Tab Panel -->
             <div class="context-tab-panel" id="melody-panel">
                 <div class="context-row">
@@ -124,45 +83,45 @@
                         <span class="context-label">Note:</span>
                         <input type="number" class="param-input" id="note-input" min="0" max="127" value="36">
                     </div>
-
+                    
                     <div class="context-section" id="channel-section">
                         <span class="context-label">Channel:</span>
                         <input type="number" class="param-input" id="channel-input" min="1" max="16" value="9">
                     </div>
+                    
+                    <div class="context-section" id="velocity-section">
+                        <span class="context-label">Velocity:</span>
+                        <input type="number" class="param-input" id="velocity-input" min="1" max="127" value="100">
+                    </div>
                 </div>
-
+                
                 <div class="context-row">
                     <div class="context-section" id="pitch-section">
                         <span class="context-label">Pitch:</span>
-                        <input type="number" class="param-input" id="pitch-input" min="0" max="127" value="0"
-                            style="width: 60px;">
-                    </div>
-
-                    <div class="context-section" id="octave-section">
-                        <span class="context-label">Octave:</span>
-                        <input type="number" class="param-input" id="octave-input" min="0" max="10" value="3"
-                            style="width: 50px;">
-                    </div>
-
-                    <div class="context-section" id="scale-section">
-                        <span class="context-label">Scale:</span>
-                        <input type="number" class="param-input" id="scale-input" min="0" max="4095" value="4095"
-                            placeholder="4095" style="width: 80px;">
+                                <input type="number" class="param-input" id="pitch-input" min="0" max="127" value="0" style="width: 60px;">
+                            </div>
+                            
+                            <div class="context-section" id="octave-section">
+                                <span class="context-label">Octave:</span>
+                                <input type="number" class="param-input" id="octave-input" min="0" max="10" value="3" style="width: 50px;">
+                            </div>
+                            
+                            <div class="context-section" id="scale-section">
+                                <span class="context-label">Scale:</span>
+                                <input type="number" class="param-input" id="scale-input" min="0" max="4095" value="4095" placeholder="4095" style="width: 80px;">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
+    
+    
     <!-- JSON Modal -->
     <div id="json-modal">
         <div id="json-content">
             <div id="json-header">
                 <div id="json-title">Sequencer Data JSON</div>
-                <div id="json-controls">
-                    <button id="json-copy">Copy</button>
-                    <button id="json-close">Close</button>
-                </div>
+                <button id="json-close">Close</button>
             </div>
             <div id="json-display">
                 <pre id="json-text"></pre>
@@ -170,149 +129,159 @@
         </div>
     </div>
 
-    <div id="import-modal">
-        <div id="import-content">
-            <div id="import-header">
-                <div id="import-title">Import Sequencer Data</div>
-                <button id="import-close">Close</button>
-            </div>
-            <div id="import-display">
-                <div id="import-instructions">
-                    <p>Paste your JSON data below and click "Import" to load it:</p>
-                </div>
-                <textarea id="import-textarea" placeholder="Paste JSON data here..."></textarea>
-                <div id="import-controls">
-                    <button id="import-execute">Import</button>
-                    <button id="import-clear">Clear</button>
-                </div>
-                <div id="import-status"></div>
-            </div>
-        </div>
-    </div>
-
     <!-- HELP modal -->
-    <!-- Help Modal -->
-    <div id="help-modal" class="modal">
-        <div id="help-content" class="modal-content">
-            <div id="help-header" class="modal-header">
-                <h2 id="help-title">Sequencer Help</h2>
-                <button id="help-close" class="modal-close-button">×</button>
-            </div>
-            <div id="help-display" class="modal-body">
-                <div class="help-section">
-                    <h3>Modes</h3>
-                    <div class="help-content">
-                        <div class="help-item">
-                            <strong>Section mode:</strong> Edit sections and tracks
-                            <ul>
-                                <li>Add/Remove sections</li>
-                                <li>Clone section / Track</li>
-                                <li>Set BPM for each section</li>
-                                <li>Add new tracks to section</li>
-                                <li>Left click / Space: Toggle step on/off</li>
-                            </ul>
-                        </div>
-                        <div class="help-item">
-                            <strong>Rhythm Mode:</strong> Edit rhythm and velocity
-                            <ul>
-                                <li>Left click: Set velocity / Toggle step</li>
-                                <li>Double click: Turn step off</li>
-                                <li>Right click: Select step</li>
-                                <li>Shift + Click / Arrows: Create selection</li>
-                                <li>Arrows Up/Down: Set velocity for selection</li>
-                                <li>Subdivisions 0-9: Create subdivision for selected 1-n steps</li>
-                                <li>Operations for selections: Inverse, Rotate, Subdivide, Clear</li> 
-                            </ul>
-                        </div>
-                        <div class="help-item">
-                            <strong>Melody Mode:</strong> Edit pitch and musical content
-                            <ul>
-                                <li>Set note from input</li>
-                                <li>Set channel</li>
-                                <li>Left click: Set pitch (0-9) from scale</li>
-                                <li>Numbers 0-9: Set pitch for selection</li>
-                                <li>Arrows Up/Down: Increase or decrease pitch</li>
-                                <li>Set scale based on <a href="https://ianring.com/musictheory/scales/">scale number</a></li>
-                                <li>Defaults to chromatic scale: 4095</li>
-            
-                            </ul>
+     <!-- Help Modal -->
+        <div id="help-modal" class="modal">
+            <div id="help-content" class="modal-content">
+                <div id="help-header" class="modal-header">
+                    <h2 id="help-title">Sequencer Help</h2>
+                    <button id="help-close" class="modal-close-button">×</button>
+                </div>
+                <div id="help-display" class="modal-body">
+                    <div class="help-section">
+                        <h3>Modes</h3>
+                        <div class="help-content">
+                            <div class="help-item">
+                                <strong>Rhythm Mode:</strong> Edit step timing and activation
+                                <ul>
+                                    <li>Left click: Toggle step on/off</li>
+                                    <li>Steps show as red (active) or grey (inactive)</li>
+                                </ul>
+                            </div>
+                            <div class="help-item">
+                                <strong>Melody Mode:</strong> Edit pitch and musical content
+                                <ul>
+                                    <li>Left click: Set pitch based on click height</li>
+                                    <li>Click same pitch again: Turn step off</li>
+                                    <li>Bottom 10% of step: Turn step off</li>
+                                    <li>Red bars show pitch height</li>
+                                    <li>Orange bars show track default pitch</li>
+                                    <li>Blue dots indicate steps with custom properties</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="help-section">
-                    <h3>Selection & Navigation & Shortcuts</h3>
-                    <div class="help-content">
-                        <div class="help-item">
-                            <strong>Selection:</strong>
-                            <ul>
-                                <li>Blue dots indicate steps with custom properties</li>
-                                <li><kbd>Left Click</kbd>: Toggle / Set Velocity or Pitch</li>
-                                <li><kbd>Shift + Click / Arrows</kbd>: Extend selection</li>
-                                <li><kbd>Right Click</kbd>: Context menu or clear selection</li>
-                                <li><kbd>Esc</kbd>: Clear selection</li>
-                                <li><kbd>Space</kbd>: Inverse selection</li>
-                                <li><kbd>Backspace</kbd>: Clear steps and subdivisions</li>
-                            </ul>
-                        </div>
-  
-                    </div>
-                </div>
-
-                <div class="help-section">
-                    <h3>Rhythm Mode Shortcuts</h3>
-                    <div class="help-content">
-                        <div class="help-item">
-                            <ul>
-                                <li><kbd>Space</kbd>: Inverse selection (toggle all selected steps)</li>
-                                <li><kbd>Backspace</kbd>: Clear step properties</li>
-                                <li><kbd>0-9, T, E</kbd>: Create quick subdivision</li>
-                            </ul>
+                    <div class="help-section">
+                        <h3>Selection & Navigation</h3>
+                        <div class="help-content">
+                            <div class="help-item">
+                                <strong>Selection:</strong>
+                                <ul>
+                                    <li><kbd>Left Click</kbd>: Select single step</li>
+                                    <li><kbd>Shift + Click</kbd>: Extend selection</li>
+                                    <li><kbd>Right Click</kbd>: Context menu or clear selection</li>
+                                    <li><kbd>Esc</kbd>: Clear selection</li>
+                                </ul>
+                            </div>
+                            <div class="help-item">
+                                <strong>Navigation:</strong>
+                                <ul>
+                                    <li><kbd>←→</kbd>: Move selection left/right</li>
+                                    <li><kbd>↑↓</kbd>: Move selection up/down (tracks)</li>
+                                    <li><kbd>Shift + ←→</kbd>: Extend selection</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="help-section">
-                    <h3>Track Controls</h3>
-                    <div class="help-content">
-                        <div class="help-item">
-                            <strong>Track Selection:</strong>
-                            <ul>
-                                <li>Click track header to select entire track</li>
-                                <li>Changes affect track defaults and existing explicit values</li>
-                                <li>Arrow keys: Change defaults + any explicit step values</li>
-                                <li>Numbers: Set same value to defaults + explicit step values</li>
-                            </ul>
-                        </div>
-                        <div class="help-item">
-                            <strong>Track Operations:</strong>
-                            <ul>
-                                <li><kbd>▲/▼</kbd>: Minimize/maximize track</li>
-                                <li><kbd>×</kbd>: Remove track (with confirmation)</li>
-                                <li><kbd>Clone</kbd>: Duplicate track</li>
-                                <li>Length controls: Adjust track length (1-32 steps)</li>
-                                <li>Pulses controls: Generate Euclidean rhythms</li>
-                                <li>Rotate controls: Rotate track by number of steps</li>
-                            </ul>
+                    <div class="help-section">
+                        <h3>Rhythm Mode Shortcuts</h3>
+                        <div class="help-content">
+                            <div class="help-item">
+                                <ul>
+                                    <li><kbd>Space</kbd>: Inverse selection (toggle all selected steps)</li>
+                                    <li><kbd>Backspace</kbd>: Clear step properties</li>
+                                    <li><kbd>0-9, T, E</kbd>: Create quick subdivision</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="help-section">
-                    <h3>General Shortcuts</h3>
-                    <div class="help-content">
-                        <div class="help-item">
-                            <ul>
-                                <li><kbd>F1</kbd> or <kbd>?</kbd>: Show this help</li>
-                                <li><kbd>Esc</kbd>: Close modals and clear selection</li>
-                            </ul>
+                    <div class="help-section">
+                        <h3>Melody Mode Shortcuts</h3>
+                        <div class="help-content">
+                            <div class="help-item">
+                                <ul>
+                                    <li><kbd>↑↓</kbd>: Change pitch of selected steps individually</li>
+                                    <li><kbd>0-9, T, E</kbd>: Set pitch to specific value (0-11)</li>
+                                    <li><kbd>Space</kbd>: Inverse selection</li>
+                                    <li><kbd>Backspace</kbd>: Clear step properties</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>Track Controls</h3>
+                        <div class="help-content">
+                            <div class="help-item">
+                                <strong>Track Selection:</strong>
+                                <ul>
+                                    <li>Click track header to select entire track</li>
+                                    <li>Changes affect track defaults and existing explicit values</li>
+                                    <li>Arrow keys: Change defaults + any explicit step values</li>
+                                    <li>Numbers: Set same value to defaults + explicit step values</li>
+                                </ul>
+                            </div>
+                            <div class="help-item">
+                                <strong>Track Operations:</strong>
+                                <ul>
+                                    <li><kbd>▲/▼</kbd>: Minimize/maximize track</li>
+                                    <li><kbd>×</kbd>: Remove track (with confirmation)</li>
+                                    <li><kbd>Clone</kbd>: Duplicate track</li>
+                                    <li>Length controls: Adjust track length (1-32 steps)</li>
+                                    <li>Pulses controls: Generate Euclidean rhythms</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>Subdivisions</h3>
+                        <div class="help-content">
+                            <div class="help-item">
+                                <ul>
+                                    <li>Select steps and use "Subdivide" to create subdivisions</li>
+                                    <li>Numbers in rhythm mode create quick subdivisions</li>
+                                    <li>"Break Subdivision" removes subdivision structure</li>
+                                    <li>Subdivisions can be nested multiple levels deep</li>
+                                    <li>Labels show original steps / subdivision count</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>Context Menu</h3>
+                        <div class="help-content">
+                            <div class="help-item">
+                                <strong>Properties:</strong> Note, Channel, Velocity, Mod, Odds
+                            </div>
+                            <div class="help-item">
+                                <strong>Melody Controls:</strong> Pitch, Octave, Scale
+                            </div>
+                            <div class="help-item">
+                                <strong>Operations:</strong> Inverse, Rotate, Subdivide, Clear
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>General Shortcuts</h3>
+                        <div class="help-content">
+                            <div class="help-item">
+                                <ul>
+                                    <li><kbd>F1</kbd> or <kbd>?</kbd>: Show this help</li>
+                                    <li><kbd>Esc</kbd>: Close modals and clear selection</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
+    
     <!-- MIDI Modal -->
     <div id="midi-modal">
         <div id="midi-content">
@@ -327,7 +296,7 @@
                         MIDI not available
                     </div>
                 </div>
-
+                
                 <div class="midi-section">
                     <h3>Output Ports</h3>
                     <div class="midi-row">
@@ -338,22 +307,19 @@
                         <button class="refresh-button" id="refresh-midi">Refresh</button>
                     </div>
                 </div>
-
+                
                 <div class="midi-section">
                     <h3>Test</h3>
                     <div class="midi-row">
                         <span class="midi-label">Test Note:</span>
-                        <input type="number" id="test-note" value="60" min="0" max="127"
-                            style="width: 60px; padding: 4px; background: #345; color: #fff; border: 1px solid #567; border-radius: 3px;">
-                        <input type="number" id="test-channel" value="0" min="0" max="16"
-                            style="width: 60px; padding: 4px; background: #345; color: #fff; border: 1px solid #567; border-radius: 3px;">
+                        <input type="number" id="test-note" value="60" min="0" max="127" style="width: 60px; padding: 4px; background: #345; color: #fff; border: 1px solid #567; border-radius: 3px;">
                         <button class="refresh-button" id="test-midi">Send Test Note</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <!-- Confirmation Dialog -->
     <div id="confirm-dialog">
         <div class="confirm-content">
@@ -365,14 +331,8 @@
             </div>
         </div>
     </div>
-
-    <div id="sequencer-container">
-        <!-- Section tabs will be inserted here by JavaScript -->
-        <div id="section-tabs-container"></div>
-
-        <!-- Main sequencer content -->
-        <div id="sequencer"></div>
-    </div>
+    
+    <div id="sequencer"></div>
 
     <!-- AudioWorklet Clock Processor -->
     <script type="text/plain" id="clock-worklet">
@@ -412,60 +372,152 @@
     <script src="sequencer.js"></script>
     <script src="audio-player.js"></script>
     <script>
-        // Shorthand for document.getElementById
-        const $ = id => document.getElementById(id);
+      const $ = id => document.getElementById(id);
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const sequencerContainer = document.getElementById('sequencer');
-            const midiManager = new MIDIManager();
-            const player = new AudioWorkletPlayer(sequencerData, midiManager);
-            const sequencer = new DataSequencer(sequencerContainer, player);
-
-            // Set sequencer reference in player for playhead conditional display
-            player.setSequencer(sequencer);
-
-            // Transport controls
-            document.getElementById('play-button').addEventListener('click', () => {
-                const followButton = document.getElementById('follow-button');
-
-                if (player.isPlaying) {
-                    player.stop();
-                    document.getElementById('play-button').textContent = 'Play';
-
-                    // Hide follow button when stopping
-                    followButton.style.display = 'none';
-
+// Initialize the sequencer and player
+document.addEventListener('DOMContentLoaded', () => {
+    const sequencerContainer = document.getElementById('sequencer');
+    const midiManager = new MIDIManager();
+    const player = new AudioWorkletPlayer(sequencerData, midiManager);
+    const sequencer = new DataSequencer(sequencerContainer, player);
+    
+    // Function to update section display in UI
+    function updateSectionDisplay() {
+        const sectionInfo = player.getSectionInfo();
+        const titleElement = document.getElementById('title');
+        if (titleElement) {
+            if (sectionInfo.isPlaying) {
+                const followIndicator = sequencer.isFollowingPlayback ? ' 📍' : '';
+                if (sectionInfo.playingIndex === sectionInfo.currentIndex) {
+                    // Currently viewing the playing section
+                    titleElement.textContent = `VibeSeq${followIndicator} - ${sectionInfo.currentName} (${sectionInfo.currentRepeat}/${sectionInfo.maxRepeats})`;
                 } else {
-                    // When starting playback, set the playing section to the currently viewed section
-                    // This allows users to start playback from whichever section they're currently viewing
-                    player.playingSectionIndex = sequencer.currentSectionIndex;
-                    player.currentSection = sequencer.currentSection;
-
-                    // Update track states for the section we're about to play
-                    player.updateTrackStates();
-
-                    // Start playback
-                    player.play();
-                    document.getElementById('play-button').textContent = 'Stop';
-
-                    // Show follow button when playing (defaulting to following mode)
-                    followButton.style.display = 'inline-block';
-                    followButton.textContent = 'Follow';
-                    followButton.classList.remove('active'); // Not active = following is ON
+                    // Viewing different section than what's playing
+                    titleElement.textContent = `VibeSeq${followIndicator} - ${sectionInfo.currentName} [Playing: ${sectionInfo.playingName} (${sectionInfo.currentRepeat}/${sectionInfo.maxRepeats})]`;
                 }
+            } else {
+                // Not playing
+                titleElement.textContent = `VibeSeq - ${sectionInfo.currentName}`;
+            }
+        }
+    }
+    
+    // Function to handle automatic section changes during playback
+    function onAutomaticSectionChange() {
+        // Use the new sequencer method that handles following logic
+        sequencer.handleAutomaticSectionAdvance(player.playingSectionIndex);
+        
+        // Update the section display
+        updateSectionDisplay();
+        
+        const sectionInfo = player.getSectionInfo();
+        if (sequencer.isFollowingPlayback) {
+            console.log(`Following playback to section: ${sectionInfo.playingName}`);
+        } else {
+            console.log(`Playback advanced to section: ${sectionInfo.playingName} (UI not following)`);
+        }
+    }
+    
+    // Monitor for automatic section changes during playback
+    let lastPlayingSectionIndex = player.playingSectionIndex;
+    setInterval(() => {
+        if (player.isPlaying && player.playingSectionIndex !== lastPlayingSectionIndex) {
+            lastPlayingSectionIndex = player.playingSectionIndex;
+            onAutomaticSectionChange();
+        }
+        
+        if (player.isPlaying) {
+            updateSectionDisplay();
+            
+            // Also update section tabs periodically to maintain visual state
+            const currentTabs = document.querySelectorAll('.section-tab');
+            currentTabs.forEach((tab, index) => {
+                const isPlaying = index === player.playingSectionIndex;
+                const isActive = index === sequencer.currentSectionIndex;
+                const isFollowing = sequencer.isFollowingPlayback && isPlaying;
+                
+                // Update classes without full re-render
+                tab.classList.toggle('playing', isPlaying);
+                tab.classList.toggle('active', isActive);
+                tab.classList.toggle('following', isFollowing);
             });
-
-            // Follow button control (toggles OFF/ON)
-            document.getElementById('follow-button').addEventListener('click', () => {
-                sequencer.toggleFollowing();
+        }
+    }, 100); // Check every 100ms
+    
+    // Transport controls
+    document.getElementById('play-button').addEventListener('click', () => {
+        if (player.isPlaying) {
+            player.stop();
+            document.getElementById('play-button').textContent = 'Play';
+            
+            // Reset following when stopping
+            sequencer.isFollowingPlayback = false;
+            
+            updateSectionDisplay(); // Reset display when stopping
+            
+            // Remove playing indicators from all tabs
+            document.querySelectorAll('.section-tab').forEach(tab => {
+                tab.classList.remove('playing', 'following');
             });
-
-            // Removed tempo control handler - BPM is now only controlled via Section tab
-
-            // Initialize player track states
-            player.updateTrackStates();
-        });
+        } else {
+            player.play();
+            document.getElementById('play-button').textContent = 'Stop';
+            
+            // If starting playback on the current section, enable following
+            if (player.currentSectionIndex === sequencer.currentSectionIndex) {
+                sequencer.isFollowingPlayback = true;
+                console.log('Starting playback on current section - following enabled');
+            }
+        }
+    });
+    
+    // Tempo control - update current section's BPM
+    document.getElementById('tempo').addEventListener('input', (e) => {
+        const bpm = parseInt(e.target.value);
+        player.setTempo(bpm);
+        
+        // Update the section BPM input in context menu
+        const sectionBpmInput = document.getElementById('section-bpm-input');
+        if (sectionBpmInput) {
+            sectionBpmInput.value = bpm;
+        }
+    });
+    
+    // Sync tempo input with current section BPM
+    function syncTempoInput() {
+        const tempoInput = document.getElementById('tempo');
+        const currentBpm = player.currentSection.bpm || 120;
+        if (tempoInput && tempoInput.value != currentBpm) {
+            tempoInput.value = currentBpm;
+        }
+    }
+    
+    // Monitor for manual section switches (UI navigation)
+    let lastManualSectionIndex = sequencer.currentSectionIndex;
+    setInterval(() => {
+        if (sequencer.currentSectionIndex !== lastManualSectionIndex) {
+            lastManualSectionIndex = sequencer.currentSectionIndex;
+            
+            // Update player to match sequencer's section (but don't stop playback)
+            if (player.currentSectionIndex !== sequencer.currentSectionIndex) {
+                player.switchToSection(sequencer.currentSectionIndex);
+            }
+            
+            syncTempoInput();
+            updateSectionDisplay();
+            
+            const followingStatus = sequencer.isFollowingPlayback ? ' (Following enabled)' : ' (Following disabled)';
+            console.log(`Manual UI navigation to section: ${sequencer.currentSection.name}${followingStatus}`);
+        }
+    }, 50);
+    
+    // Initialize display
+    updateSectionDisplay();
+    syncTempoInput();
+    
+    // Initialize player track states
+    player.updateTrackStates();
+});
     </script>
 </body>
-
 </html>

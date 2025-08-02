@@ -107,11 +107,128 @@ class DataSequencer {
             this.cloneCurrentSection();
         });
 
-        // NEW: Clone track button
         $('clone-track-button').addEventListener('click', (e) => {
             e.stopPropagation();
             this.cloneSelectedTrack();
         });
+
+        $('clear-section-button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.confirmClearSection();
+        });
+
+        $('clear-all-button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.confirmClearAll();
+        });
+
+    }
+
+    confirmClearSection() {
+        this.pendingClearAction = 'section';
+
+        $('confirm-title').textContent = 'Clear Section';
+        $('confirm-message').textContent = `Are you sure you want to clear all patterns in "${this.currentSection.name}"? This will reset all tracks to empty patterns but keep the track structure.`;
+        $('confirm-dialog').classList.add('show');
+    }
+
+    confirmClearAll() {
+        this.pendingClearAction = 'all';
+
+        $('confirm-title').textContent = 'Clear All Sections';
+        $('confirm-message').textContent = `Are you sure you want to clear all patterns in ALL sections? This will reset every track in every section to empty patterns but keep all section and track structures.`;
+        $('confirm-dialog').classList.add('show');
+    }
+
+    newEmptyTrack = () => ({
+        name: "Track 1",
+        defaults: {
+            note: 36,
+            channel: 9,
+            velocity: 100
+        },
+        playback: { muted: false },
+        pattern: [
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 },
+            { type: "step", fire: 0 }
+        ],
+        operations: { euclidean: { steps: 16, pulses: 0 }, rotate: 1 },
+        layout: { minimized: false, selected: false }
+    });
+
+    clearCurrentSection() {
+
+        // Replace all tracks with the single new track
+        this.currentSection.tracks = [this.newEmptyTrack()];
+
+        // Clear selection and update
+        this.clearSelection();
+        this.player.updateTrackStates();
+        this.render();
+        this.updateContextMenu();
+
+        console.log(`Cleared section "${this.currentSection.name}" - removed all tracks, left one empty track`);
+    }
+
+    clearAllSections() {
+        // Create a fresh Section 1 with one empty track
+        const freshSection = {
+            name: "Section 1",
+            bpm: 120,
+            repeat: 1,
+            tracks: [this.newEmptyTrack()]
+        };
+
+        // Replace all sections with just the fresh Section 1
+        this.data = [freshSection];
+        this.player.sections = this.data;
+
+        console.log(this.data);
+
+        // Reset to Section 1
+        this.currentSectionIndex = 0;
+        this.currentSection = this.data[0];
+        this.player.currentSectionIndex = 0;
+        this.player.currentSection = this.data[0];
+        this.player.playingSectionIndex = 0;
+
+        // Clear selection and reset following
+        this.clearSelection();
+        this.isFollowingPlayback = true;
+
+        // Update player and UI
+        this.player.updateTrackStates();
+        this.render();
+        this.updateContextMenu();
+
+    }
+
+    clearTrackPattern(track) {
+        // Reset pattern to default length with all inactive steps
+        const currentLength = track.pattern.length;
+        track.pattern = Array.from({ length: currentLength }, () => ({
+            type: "step",
+            fire: 0
+        }));
+
+        // Reset euclidean operations
+        if (track.operations && track.operations.euclidean) {
+            track.operations.euclidean.pulses = 0;
+        }
     }
 
     cloneSelectedTrack() {
@@ -2416,6 +2533,12 @@ class DataSequencer {
         } else if (this.pendingRemoveSectionIndex !== undefined) {
             this.removeSection(this.pendingRemoveSectionIndex);
             this.pendingRemoveSectionIndex = undefined;
+        } else if (this.pendingClearAction === 'section') {
+            this.clearCurrentSection();
+            this.pendingClearAction = undefined;
+        } else if (this.pendingClearAction === 'all') {
+            this.clearAllSections();
+            this.pendingClearAction = undefined;
         }
         this.hideConfirmDialog();
     }
@@ -2423,6 +2546,8 @@ class DataSequencer {
     hideConfirmDialog() {
         $('confirm-dialog').classList.remove('show');
         this.pendingRemoveTrackIndex = undefined;
+        this.pendingRemoveSectionIndex = undefined;
+        this.pendingClearAction = undefined;
     }
 
     removeTrack(trackIndex) {
@@ -4306,18 +4431,9 @@ class DataSequencer {
                 break;
 
             case 'subdivision':
-                // Clear properties from the entire subdivision recursively
-                const subdivision = this.navigateToSubdivision(this.selection.trackIndex, this.selection.subdivisionPath);
-                if (subdivision) {
-                    if (subdivision.type === 'step') {
-                        // If it's a single step, clear it
-                        this.clearStepCustomProperties(subdivision);
-                    } else if (subdivision.subdivide && subdivision.pattern) {
-                        // If it's a subdivision container, clear all steps within it recursively
-                        this.clearPatternPropertiesRecursive(subdivision.pattern);
-                    }
-                    this.selectionChanged = true;
-                }
+                // Remove the entire subdivision and replace with regular steps
+                this.removeSelectedSubdivision();
+                this.selectionChanged = true;
                 break;
 
             case 'subdivision-steps':
@@ -4341,8 +4457,28 @@ class DataSequencer {
         }
 
         if (this.selectionChanged) {
+            this.clearSelection();
+            this.player.updateTrackStates();
             this.render();
             this.updateContextMenu();
+        }
+    }
+
+    removeSelectedSubdivision() {
+        if (this.selection.type !== 'subdivision' || !this.selection.subdivisionPath) {
+            return;
+        }
+
+        const subdivisionPath = this.selection.subdivisionPath;
+
+        if (subdivisionPath.length === 1) {
+            // Main subdivision - replace with regular steps
+            const [stepIndex] = subdivisionPath;
+            this.breakMainSubdivision(this.selection.trackIndex, stepIndex);
+        } else {
+            // Nested subdivision - remove nested level
+            const [stepIndex, ...path] = subdivisionPath;
+            this.breakNestedSubdivision(this.selection.trackIndex, stepIndex, path);
         }
     }
 

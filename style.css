@@ -259,6 +259,36 @@ button:hover {
     opacity: 0.5;
 }
 
+/* Clear buttons styling */
+.clear-section-button,
+.clear-all-button {
+    background: #d44;
+    border: 1px solid #f66;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clear-section-button:hover,
+.clear-all-button:hover {
+    background: #f55;
+    border-color: #f88;
+}
+
+.clear-all-button {
+    background: #a22;
+    border-color: #d44;
+}
+
+.clear-all-button:hover {
+    background: #c33;
+    border-color: #f55;
+}
+
+
 /* ==========================================================================
    CONTEXT MENU
    ========================================================================== */
@@ -814,10 +844,11 @@ kbd {
     .help-content {
         font-size: 12px;
     }
-}567;
-    border-radius: 3px 3px 0 0;
 }
 
+/* ==========================================================================
+   CONTEXT MENU STYLES
+   ========================================================================== */
 .context-tab {
     padding: 8px 16px;
     cursor: pointer;

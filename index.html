@@ -38,14 +38,7 @@
                 <span id="selection-title-text">No Selection</span>
             </div>
 
-            <div class="context-tab-panel active" id="section-panel">
-    <!-- Section Info Display (Always shown) -->
-    <div class="context-row">
-        <div class="context-section section-info">
-            <span class="section-display" id="section-display">Section 1</span>
-        </div>
-    </div>
-
+ <div class="context-tab-panel active" id="section-panel">
     <div class="context-row">
         <div class="context-section">
             <span class="context-label">Name:</span>
@@ -70,6 +63,8 @@
         <div class="context-section">
             <button class="operation-button clone-section" id="clone-section-button">Clone Section</button>
             <button class="operation-button clone-track-button" id="clone-track-button" disabled>Clone Track</button>
+            <button class="clear-section-button" id="clear-section-button">Clear Section</button>
+            <button class="clear-all-button" id="clear-all-button">Clear All</button>
         </div>
     </div>
 </div>
@@ -225,7 +220,7 @@
                                 <li>Right click: Select step</li>
                                 <li>Shift + Click / Arrows: Create selection</li>
                                 <li>Arrows Up/Down: Set velocity for selection</li>
-                                <li>Numbers 0-9: Create subdivision for selection</li>
+                                <li>Subdivisions 0-9: Create subdivision for selected 1-n steps</li>
                                 <li>Operations for selections: Inverse, Rotate, Subdivide, Clear</li> 
                             </ul>
                         </div>
@@ -257,7 +252,7 @@
                                 <li><kbd>Right Click</kbd>: Context menu or clear selection</li>
                                 <li><kbd>Esc</kbd>: Clear selection</li>
                                 <li><kbd>Space</kbd>: Inverse selection</li>
-                                <li><kbd>Backspace</kbd>: Clear step properties</li>
+                                <li><kbd>Backspace</kbd>: Clear steps and subdivisions</li>
                             </ul>
                         </div>
   

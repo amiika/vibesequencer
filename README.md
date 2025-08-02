@@ -13,7 +13,7 @@ Main features:
 
 **g200kg**:
 * Inspired by [FlexGrid](https://github.com/g200kg/flex-rhythm)
-* Also works great with [WebAudio-TinySynth](https://g200kg.github.io/webaudio-tinysynth/soundedit.html)
+* Also works great with [WebAudio-TinySynth](https://g200kg.github.io/webaudio-tinysynth/soundedit.html) (Using in Chrome)
   
 **Claude code**
 * The joy and the pain

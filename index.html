@@ -416,6 +416,14 @@
     <script src="sequencer.js"></script>
     <script src="audio-player.js"></script>
     <script>
+
+        // DEV MODE HAX: Reload the page to ensure all changes are applied
+        window.location.reload();
+        if (window.location.search.includes("reload")) {
+            window.location.href = window.location.href.split("?")[0];
+            return;
+        }
+
         // Shorthand for document.getElementById
         const $ = id => document.getElementById(id);
 

@@ -3,30 +3,73 @@ class MIDIManager {
         this.midiAccess = null;
         this.outputPort = null;
         this.isAvailable = false;
-        this.activeNotes = new Map(); // Track active notes for proper note-off
+        this.activeNotes = new Map();
+        this.hasShownWarning = false; // Track if warning was already shown
         this.init();
     }
 
     async init() {
-        try {
-            if (navigator.requestMIDIAccess) {
-                this.midiAccess = await navigator.requestMIDIAccess();
-                this.isAvailable = true;
-                this.updateStatus();
-                this.setupEventListeners();
-                this.populateOutputPorts();
+        // Check if WebMIDI is supported
+        if (!navigator.requestMIDIAccess) {
+            this.showWebMIDIWarning();
+            this.updateStatus('WebMIDI not supported in this browser');
+            return;
+        }
 
-                // Listen for port changes
-                this.midiAccess.addEventListener('statechange', () => {
-                    this.populateOutputPorts();
-                    this.updateStatus();
-                });
-            } else {
-                this.updateStatus('MIDI not supported in this browser');
-            }
+        try {
+            this.midiAccess = await navigator.requestMIDIAccess();
+            this.isAvailable = true;
+            this.updateStatus();
+            this.setupEventListeners();
+            this.populateOutputPorts();
+
+            // Listen for port changes
+            this.midiAccess.addEventListener('statechange', () => {
+                this.populateOutputPorts();
+                this.updateStatus();
+            });
         } catch (error) {
             console.error('MIDI initialization failed:', error);
             this.updateStatus('MIDI access denied or failed');
+        }
+    }
+
+    showWebMIDIWarning() {
+        if (this.hasShownWarning) return;
+        
+        this.hasShownWarning = true;
+        const modal = document.getElementById('webmidi-warning-modal');
+        if (modal) {
+            modal.classList.add('show');
+            
+            // Setup close button
+            const closeButton = document.getElementById('webmidi-warning-close');
+            if (closeButton) {
+                closeButton.addEventListener('click', () => {
+                    this.hideWebMIDIWarning();
+                });
+            }
+
+            // Close on outside click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.hideWebMIDIWarning();
+                }
+            });
+
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    this.hideWebMIDIWarning();
+                }
+            });
+        }
+    }
+
+    hideWebMIDIWarning() {
+        const modal = document.getElementById('webmidi-warning-modal');
+        if (modal) {
+            modal.classList.remove('show');
         }
     }
 

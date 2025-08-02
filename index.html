@@ -358,6 +358,26 @@
         </div>
     </div>
 
+    <!-- WebMIDI Warning Modal -->
+<div id="webmidi-warning-modal">
+    <div id="webmidi-warning-content">
+        <div id="webmidi-warning-title">WebMIDI Not Supported</div>
+        <div id="webmidi-warning-message">
+            Your browser doesn't support WebMIDI API, which is required for MIDI functionality in this sequencer.
+            <br><br>
+            <strong>Supported browsers:</strong> Chrome, Edge, Opera
+            <br>
+            <strong>Not supported:</strong> Firefox, Safari
+            <br><br>
+            You can still vibe the sequencer, but MIDI output won't work.
+        </div>
+        <a href="https://caniuse.com/midi" target="_blank" rel="noopener noreferrer" id="webmidi-warning-link">
+            Check Browser Support
+        </a>
+        <button id="webmidi-warning-close">Continue Anyway</button>
+    </div>
+</div>
+
     <!-- Confirmation Dialog -->
     <div id="confirm-dialog">
         <div class="confirm-content">

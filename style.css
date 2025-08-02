@@ -1,0 +1,1842 @@
+/* ==========================================================================
+   BASE STYLES
+   ========================================================================== */
+
+body {
+    background: #234;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+button {
+    padding: 8px 16px;
+    background: #567;
+    color: #fff;
+    border: 1px solid #888;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background: #678;
+}
+
+/* ==========================================================================
+   MENU BAR
+   ========================================================================== */
+
+#menu {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.menu-item {
+    margin-right: 20px;
+}
+
+#title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.right-menu {
+    margin-left: auto;
+}
+
+#follow-button {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+#follow-button:hover {
+    background: #567;
+}
+
+#follow-button.active {
+    color: #fff;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   SECTION TABS
+   ========================================================================== */
+
+.section-tabs {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 5px;
+    border: 1px solid #567;
+    background: #234;
+}
+
+.section-tab {
+    background: #345;
+    border-right: 1px solid #567;
+    padding: 8px 20px 8px 16px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    color: #aaa;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 100px;
+    justify-content: center;
+    position: relative;
+}
+
+.section-tab:last-child {
+    border-right: none;
+}
+
+.section-tab:hover {
+    background: #456;
+    color: #fff;
+}
+
+.section-tab.active {
+    background: #567;
+    color: #0af;
+    border-bottom: 2px solid #0af;
+}
+
+.section-tab-name {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: inherit;
+}
+
+.section-tab-close {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    font-size: 10px;
+    background: #f44;
+    border: none;
+    cursor: pointer;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: background 0.2s;
+}
+
+.section-tab-close:hover {
+    background: #f66;
+}
+
+/* Playing section indicators */
+.section-tab.playing {
+    border: 2px solid rgb(78, 85, 70) !important;
+    background: #345;
+    color: inherit;
+}
+
+.section-tab.playing:hover {
+    background: #456 !important;
+}
+
+.section-tab.active.playing {
+    background: #567 !important;
+    color: #0af !important;
+    border: 2px solid #692 !important;
+    border-bottom: 2px solid #0af !important;
+}
+
+.section-tab.playing .section-tab-name::before {
+    content: '▶ ';
+    color: rgb(87, 129, 32);
+    font-size: 10px;
+    margin-right: 4px;
+}
+
+.section-tab.playing .section-tab-close {
+    background: #f44;
+}
+
+.section-tab.playing:hover .section-tab-close {
+    background: #f66;
+}
+
+/* Shadow section tab for adding new sections */
+.shadow-section-tab {
+    background: #234;
+    border-right: 1px solid #567;
+    border: 2px dashed #567;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #666;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    opacity: 0.6;
+}
+
+.shadow-section-tab:hover {
+    background: #345;
+    border-color: #0af;
+    color: #0af;
+    opacity: 0.9;
+}
+
+/* Section info display */
+.section-info {
+    background: #567 !important;
+    border-color: #789 !important;
+    font-weight: bold;
+    color: #fff !important;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 5px;
+    padding: 8px 15px;
+}
+
+.section-display {
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+}
+
+/* Section control styling */
+.section-name-control,
+.section-repeat-control, 
+.section-bpm-control {
+    background: #567;
+    color: #fff;
+    border: 1px solid #789;
+}
+
+.section-name-control:focus,
+.section-repeat-control:focus,
+.section-bpm-control:focus {
+    outline: 1px solid #0af;
+    background: #678;
+}
+
+
+/* Clone track button styling */
+.clone-track-button {
+    background: #469;
+    border: 1px solid #5a9;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clone-track-button:hover:not(:disabled) {
+    background: #57a;
+    border-color: #6ba;
+}
+
+.clone-track-button:disabled {
+    background: #333;
+    border-color: #555;
+    color: #777;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* ==========================================================================
+   CONTEXT MENU
+   ========================================================================== */
+
+#context-menu {
+    background: #345;
+    border: 2px solid #567;
+    padding: 0;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Context Menu Tabs */
+.context-tabs {
+    display: flex;
+    background: #234;
+    border-bottom: 1px solid #567;
+    border-radius: 3px 3px 0 0;
+}
+
+.context-tab {
+    padding: 8px 16px;
+    cursor: pointer;
+    background: #345;
+    border-right: 1px solid #567;
+    font-size: 12px;
+    font-weight: bold;
+    color: #aaa;
+    transition: all 0.2s;
+}
+
+.context-tab:last-child {
+    border-right: none;
+}
+
+.context-tab:hover {
+    background: #456;
+    color: #fff;
+}
+
+.context-tab.active {
+    background: #567;
+    color: #0af;
+}
+
+/* Tab-specific styling */
+.context-tab[data-tab="section"] {
+    color: rgb(0, 123, 21);
+}
+
+.context-tab[data-tab="section"].active {
+    background: #567;
+    color: rgb(43, 255, 0);
+    border-bottom: 2px solid rgb(0, 255, 255);
+}
+
+.context-tab[data-tab="rhythm"] {
+    color: rgb(124, 135, 255);
+}
+
+.context-tab[data-tab="rhythm"].active {
+    background: #567;
+    color: rgb(190, 147, 253);
+    border-bottom: 2px solid rgb(0, 255, 255);
+}
+
+.context-tab[data-tab="melody"] {
+    color: rgb(254, 0, 0);
+}
+
+.context-tab[data-tab="melody"].active {
+    background: #567;
+    color: rgb(255, 119, 0);
+    border-bottom: 2px solid rgb(0, 255, 255);
+}
+
+#json-title,
+#import-title,
+#midi-title,
+#help-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    margin: 0;
+}
+
+#json-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#json-copy {
+    background: #567;
+    border: 1px solid #789;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+#json-copy:hover {
+    background: #678;
+}
+
+#json-close,
+#import-close,
+#midi-close,
+#help-close {
+    background: #f44;
+    border: none;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#json-close:hover,
+#import-close:hover,
+#midi-close:hover,
+#help-close:hover {
+    background: #f66;
+}
+
+#json-display,
+#import-display,
+#midi-settings,
+#help-display {
+    flex: 1;
+    padding: 20px;
+    overflow: auto;
+    color: #fff;
+    background: #234;
+    border-radius: 0 0 6px 6px;
+}
+
+#json-display {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    background: #123;
+}
+
+#json-display pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+#import-display {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#import-instructions {
+    font-size: 14px;
+    color: #ccc;
+}
+
+#import-instructions p {
+    margin: 0;
+}
+
+#import-textarea {
+    flex: 1;
+    min-height: 200px;
+    background: #123;
+    color: #fff;
+    border: 1px solid #567;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    resize: vertical;
+}
+
+#import-textarea:focus {
+    outline: 1px solid #0af;
+    background: #134;
+}
+
+#import-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#import-execute {
+    background: #469;
+    border: 1px solid #57a;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#import-execute:hover {
+    background: #57a;
+}
+
+#import-clear {
+    background: #567;
+    border: 1px solid #789;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#import-clear:hover {
+    background: #678;
+}
+
+#import-status {
+    font-size: 14px;
+    font-weight: bold;
+    min-height: 20px;
+}
+
+#import-button {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+#import-button:hover {
+    background: #567;
+}
+
+/* ==========================================================================
+   JSON SYNTAX HIGHLIGHTING
+   ========================================================================== */
+
+.json-key {
+    color: #9cdcfe;
+}
+
+.json-string {
+    color: #ce9178;
+}
+
+.json-number {
+    color: #b5cea8;
+}
+
+.json-boolean {
+    color: #569cd6;
+}
+
+.json-null {
+    color: #569cd6;
+}
+
+.json-punctuation {
+    color: #cccccc;
+}
+
+/* ==========================================================================
+   MIDI MODAL SPECIFIC STYLES
+   ========================================================================== */
+
+.midi-section {
+    margin-bottom: 20px;
+}
+
+.midi-section h3 {
+    margin: 0 0 10px 0;
+    color: #0af;
+    font-size: 14px;
+}
+
+.midi-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.midi-label {
+    min-width: 120px;
+    font-size: 12px;
+    color: #aaa;
+}
+
+.midi-select {
+    flex: 1;
+    padding: 4px 8px;
+    background: #345;
+    color: #fff;
+    border: 1px solid #567;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.midi-select:focus {
+    outline: 1px solid #0af;
+    background: #456;
+}
+
+.midi-status {
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.midi-status.connected {
+    background: #2a5d2a;
+    color: #8f8;
+    border: 1px solid #4a8;
+}
+
+.midi-status.disconnected {
+    background: #5d2a2a;
+    color: #f88;
+    border: 1px solid #a44;
+}
+
+.midi-status.unavailable {
+    background: #5d5d2a;
+    color: #ff8;
+    border: 1px solid #aa4;
+}
+
+.refresh-button {
+    background: #567;
+    border: 1px solid #789;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.refresh-button:hover {
+    background: #678;
+}
+
+#json-button,
+#midi-button {
+    float: right;
+    top: 20px;
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    z-index: 100;
+}
+
+#json-button {
+    right: 20px;
+}
+
+#midi-button {
+    right: 120px;
+}
+
+#json-button:hover,
+#midi-button:hover {
+    background: #567;
+}
+
+/* ==========================================================================
+   HELP MODAL SPECIFIC STYLES
+   ========================================================================== */
+
+.help-section {
+    margin-bottom: 25px;
+}
+
+.help-section h3 {
+    color: #0af;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 12px 0;
+    border-bottom: 1px solid #456;
+    padding-bottom: 5px;
+}
+
+.help-content {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.help-item {
+    margin-bottom: 15px;
+}
+
+.help-item strong {
+    color: #fff;
+    font-weight: bold;
+}
+
+.help-item ul {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+}
+
+.help-item li {
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+kbd {
+    background: #456;
+    border: 1px solid #678;
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-family: monospace;
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    white-space: nowrap;
+}
+
+.menu-button {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+.menu-button:hover {
+    background: #567;
+}
+
+#help-display::-webkit-scrollbar {
+    width: 8px;
+}
+
+#help-display::-webkit-scrollbar-track {
+    background: #345;
+    border-radius: 4px;
+}
+
+#help-display::-webkit-scrollbar-thumb {
+    background: #567;
+    border-radius: 4px;
+}
+
+#help-display::-webkit-scrollbar-thumb:hover {
+    background: #678;
+}
+
+/* ==========================================================================
+   CONFIRMATION DIALOG - MUST BE HIDDEN BY DEFAULT
+   ========================================================================== */
+
+#confirm-dialog {
+    display: none !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+#confirm-dialog.show {
+    display: flex !important;
+}
+
+.confirm-content {
+    background: #234;
+    border: 2px solid #567;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    min-width: 300px;
+}
+
+.confirm-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.confirm-message {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #ccc;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.confirm-button {
+    padding: 8px 16px;
+    border: 1px solid #678;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.confirm-button.yes {
+    background: #f44;
+    color: #fff;
+}
+
+.confirm-button.yes:hover {
+    background: #f66;
+}
+
+.confirm-button.no {
+    background: #456;
+    color: #fff;
+}
+
+.confirm-button.no:hover {
+    background: #567;
+}
+
+/* ==========================================================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    #help-content {
+        width: 95%;
+        height: 95%;
+    }
+    
+    .help-item ul {
+        padding-left: 15px;
+    }
+    
+    .help-content {
+        font-size: 12px;
+    }
+}567;
+    border-radius: 3px 3px 0 0;
+}
+
+.context-tab {
+    padding: 8px 16px;
+    cursor: pointer;
+    background: #345;
+    border-right: 1px solid #567;
+    font-size: 12px;
+    font-weight: bold;
+    color: #aaa;
+    transition: all 0.2s;
+}
+
+.context-tab:last-child {
+    border-right: none;
+}
+
+.context-tab:hover {
+    background: #456;
+    color: #fff;
+}
+
+.context-tab.active {
+    background: #567;
+    color: #0af;
+}
+
+/* Context content */
+.context-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.context-tab-panel {
+    display: none;
+}
+
+.context-tab-panel.active {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.context-section.title {
+    background: #345;
+    border-color: #567;
+    font-weight: bold;
+    color: #0af;
+    width: 95%;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+.context-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.context-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px;
+    background: #456;
+    border-radius: 3px;
+    border: 1px solid #678;
+}
+
+.context-section.active {
+    border-color: #0af;
+    background: #567;
+}
+
+.context-label {
+    font-weight: bold;
+    font-size: 12px;
+    color: #aaa;
+}
+
+.context-value {
+    font-size: 12px;
+    color: #fff;
+}
+
+.param-input {
+    width: 50px;
+    padding: 2px 4px;
+    font-size: 11px;
+    text-align: center;
+    background: #567;
+    color: #fff;
+    border: 1px solid #789;
+}
+
+.operation-button {
+    padding: 4px 8px;
+    font-size: 11px;
+    background: #567;
+    border: 1px solid #789;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.operation-button:hover {
+    background: #678;
+}
+
+.operation-button.active {
+    background: #0af;
+    border-color: #0cf;
+}
+
+.operation-button.clone {
+    background: #469;
+    border: 1px solid #5a9;
+}
+
+.operation-button.clone:hover {
+    background: #57a;
+}
+
+/* ==========================================================================
+   INDEX ROW
+   ========================================================================== */
+
+.index-row {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.index-header {
+    width: 150px;
+    background: #234;
+    border: 1px solid #567;
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.index-steps {
+    display: flex;
+    flex: 1;
+    border: 1px solid #567;
+    border-left: none;
+}
+
+.index-step {
+    flex: 1;
+    text-align: center;
+    padding: 5px;
+    background: #345;
+    font-size: 12px;
+    border-right: 1px solid #567;
+}
+
+.index-step:last-child {
+    border-right: none;
+}
+
+.index-step.current {
+    background: #ff8;
+    color: #000;
+}
+
+/* ==========================================================================
+   TRACK CONTAINER
+   ========================================================================== */
+
+.track-container {
+    border: 1px solid #567;
+}
+
+.track-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid #567;
+    min-height: 40px;
+}
+
+.track-row:last-child {
+    border-bottom: none;
+}
+
+.track-row.minimized {
+    min-height: 30px;
+}
+
+/* ==========================================================================
+   TRACK HEADERS
+   ========================================================================== */
+
+.track-name-input-small {
+    border: 1px solid #678;
+    padding: 1px 3px;
+    font-size: 10px;
+    border-radius: 2px;
+    width: 80px;
+    height: 20px;
+    background: #456;
+    color: #fff;
+}
+
+.track-name-input-small:focus {
+    outline: 1px solid #0af;
+    background: #567;
+}
+
+.track-header {
+    width: 150px;
+    background: #345;
+    border-right: 1px solid #567;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+    cursor: pointer;
+    gap: 4px;
+}
+
+.track-header.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+    background: #456;
+}
+
+.track-row.minimized .track-header {
+    padding: 4px 8px;
+}
+
+.track-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.track-row.minimized .track-controls {
+    display: none;
+}
+
+.track-control-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+}
+
+.track-name-input {
+    border: 1px solid #678;
+    padding: 1px 3px;
+    font-size: 10px;
+    border-radius: 2px;
+    width: 110px;
+    height: 20px;
+}
+
+.track-control-input {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 1px 3px;
+    font-size: 10px;
+    border-radius: 2px;
+    width: 30px;
+    height: 20px;
+    text-align: center;
+}
+
+.track-control-input::-webkit-outer-spin-button,
+.track-control-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.track-control-input:focus {
+    outline: 1px solid #0af;
+    background: #567;
+}
+
+.track-control-label {
+    color: #aaa;
+    min-width: 20px;
+}
+
+.track-control-checkbox {
+    margin: 0;
+}
+
+.track-button {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 2px 6px;
+    font-size: 9px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.track-button:hover {
+    background: #567;
+}
+
+.track-button.clone {
+    background: #469;
+}
+
+.track-button.clone:hover {
+    background: #57a;
+}
+
+.track-control-with-buttons {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.track-control-button {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 1px 4px;
+    font-size: 9px;
+    border-radius: 2px;
+    cursor: pointer;
+    width: 17px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.track-control-button:hover {
+    background: #567;
+}
+
+.minimize-button {
+    position: absolute;
+    top: 2px;
+    right: 20px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    font-size: 10px;
+    background: #456;
+    border: 1px solid #678;
+}
+
+.remove-button {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    font-size: 10px;
+    background: #f44;
+    border: none;
+    cursor: pointer;
+}
+
+.remove-button:hover {
+    background: #f66;
+}
+
+/* ==========================================================================
+   SHADOW TRACK (ADD NEW TRACK)
+   ========================================================================== */
+
+.shadow-track-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid #567;
+    min-height: 40px;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.shadow-track-row:hover {
+    opacity: 0.9;
+}
+
+.shadow-track-header {
+    width: 150px;
+    background: #234;
+    border-right: 1px solid #567;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border: 2px dashed #567;
+    border-right: 1px solid #567;
+    transition: all 0.2s ease;
+}
+
+.shadow-track-row:hover .shadow-track-header {
+    background: #345;
+    border-color: #0af;
+}
+
+.shadow-track-text {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.shadow-track-row:hover .shadow-track-text {
+    color: #0af;
+}
+
+.shadow-track-steps {
+    display: flex;
+    flex: 1;
+    background: #234;
+    border: 2px dashed #567;
+    border-left: none;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.shadow-track-row:hover .shadow-track-steps {
+    border-color: #0af;
+    background: #345;
+}
+
+/* ==========================================================================
+   STEPS AND SUBDIVISIONS
+   ========================================================================== */
+
+.steps-container {
+    display: flex;
+    flex: 1;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #456;
+    cursor: pointer;
+    position: relative;
+    min-height: 38px;
+    border-right: 1px solid #567;
+}
+
+.step:last-child {
+    border-right: none;
+}
+
+.track-row.minimized .step {
+    min-height: 18px;
+}
+
+.step.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+    position: relative;
+    z-index: 10;
+}
+
+.subdivision-step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #345;
+    cursor: pointer;
+    font-size: 10px;
+    border-right: 1px solid #567;
+    position: relative;
+}
+
+.subdivision-step:last-child {
+    border-right: none;
+}
+
+.subdivision-step.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Enhanced selection visibility for selected steps with visualizations */
+.step.selected.has-pitch,
+.step.selected.has-velocity,
+.step.selected.has-velocity-bg,
+.subdivision-step.selected.has-pitch,
+.subdivision-step.selected.has-velocity,
+.subdivision-step.selected.has-velocity-bg {
+    outline: 3px solid #0af !important;
+    outline-offset: -3px !important;
+    z-index: 10;
+}
+
+/* Make sure nested subdivision selections work properly */
+.subdivision .subdivision .subdivision-step.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+    z-index: 10;
+}
+
+.subdivision {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.subdivision-selected {
+    outline: 3px solid #0af !important;
+    outline-offset: -3px !important;
+    background: rgba(0, 170, 255, 0.1) !important;
+    position: relative;
+    z-index: 10;
+}
+
+.subdivision-selected::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid #0af;
+    pointer-events: none;
+    z-index: 11;
+}
+
+.subdivision.subdivision-selected {
+    background: rgba(0, 170, 255, 0.15) !important;
+}
+
+.subdivision-substeps-selected {
+    outline: 2px dashed #0af !important;
+    outline-offset: -2px;
+    position: relative;
+}
+
+.subdivision-container {
+    position: relative;
+}
+
+/* Nested subdivisions */
+.subdivision .subdivision {
+    border-top: 1px solid #567;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.subdivision .subdivision .subdivision-step {
+    background: #234;
+    font-size: 8px;
+    border-right: 1px solid #456;
+}
+
+.subdivision .subdivision .subdivision-step:last-child {
+    border-right: none;
+}
+
+.subdivision .subdivision .subdivision-step.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+}
+
+.subdivision-label {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    font-size: 8px;
+    color: #666;
+    background: rgba(0,0,0,0.7);
+    padding: 1px 2px;
+    border-radius: 2px;
+    z-index: 5;
+}
+
+/* ==========================================================================
+   STEP COLORS BY CONTEXT TAB
+   ========================================================================== */
+
+/* Default step colors (red) - Melody mode */
+.step.active {
+    background: #e02;
+}
+
+.subdivision-step.active {
+    background: #e02;
+}
+
+.subdivision .subdivision .subdivision-step.active {
+    background: #c01;
+}
+
+.track-row.minimized .step.active {
+    background: #e02;
+}
+
+.track-row.minimized .subdivision-step.active {
+    background: #e02;
+}
+
+/* Rhythm tab active - Blue steps */
+body.rhythm-mode .step.active {
+    background: #2a2a5d;
+}
+
+body.rhythm-mode .subdivision-step.active {
+    background: #2a2a5d;
+}
+
+body.rhythm-mode .subdivision .subdivision .subdivision-step.active {
+    background: #1a1a4d;
+}
+
+body.rhythm-mode .track-row.minimized .step.active {
+    background: #2a2a5d;
+}
+
+body.rhythm-mode .track-row.minimized .subdivision-step.active {
+    background: #2a2a5d;
+}
+
+/* Section tab active - Green steps */
+body.section-mode .step.active {
+    background: #2a5d2a;
+}
+
+body.section-mode .subdivision-step.active {
+    background: #2a5d2a;
+}
+
+body.section-mode .subdivision .subdivision .subdivision-step.active {
+    background: #1a4d1a;
+}
+
+body.section-mode .track-row.minimized .step.active {
+    background: #2a5d2a;
+}
+
+body.section-mode .track-row.minimized .subdivision-step.active {
+    background: #2a5d2a;
+}
+
+/* ==========================================================================
+   PITCH VISUALIZATION (MELODY MODE)
+   ========================================================================== */
+
+.step.has-pitch {
+    position: relative;
+    overflow: hidden;
+    background: #456;
+}
+
+.step.has-pitch::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: #e02;
+    height: calc(var(--pitch-height, 100%) - 4px);
+    max-height: calc(100% - 4px);
+    transition: height 0.1s ease;
+    pointer-events: none;
+    z-index: 1;
+    min-height: 3px;
+}
+
+/* Larger inset for selected steps with thicker borders */
+.step.selected.has-pitch::after {
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    height: calc(var(--pitch-height, 100%) - 6px);
+    max-height: calc(100% - 6px);
+}
+
+.subdivision-step.has-pitch {
+    position: relative;
+    overflow: hidden;
+    background: #345;
+}
+
+.subdivision-step.has-pitch::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: #e02;
+    height: calc(var(--pitch-height, 100%) - 4px);
+    max-height: calc(100% - 4px);
+    transition: height 0.1s ease;
+    pointer-events: none;
+    z-index: 1;
+    min-height: 3px;
+}
+
+/* Larger inset for selected subdivision steps */
+.subdivision-step.selected.has-pitch::after {
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    height: calc(var(--pitch-height, 100%) - 6px);
+    max-height: calc(100% - 6px);
+}
+
+.step.has-pitch.active {
+    background: #456;
+}
+
+.subdivision-step.has-pitch.active {
+    background: #345;
+}
+
+/* Hide pitch visualization for minimized tracks */
+.track-row.minimized .step.has-pitch::after,
+.track-row.minimized .subdivision-step.has-pitch::after {
+    display: none;
+}
+
+.track-row.minimized .step.has-pitch,
+.track-row.minimized .subdivision-step.has-pitch {
+    background: #456;
+}
+
+.track-row.minimized .subdivision-step.has-pitch {
+    background: #345;
+}
+
+/* ==========================================================================
+   VELOCITY VISUALIZATION (RHYTHM MODE)
+   ========================================================================== */
+
+.step.has-velocity {
+    position: relative;
+    overflow: hidden;
+    background: #456;
+}
+
+.step.has-velocity::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: #05f;
+    height: calc(var(--velocity-height, 100%) - 4px);
+    max-height: calc(100% - 4px);
+    transition: height 0.1s ease;
+    pointer-events: none;
+    z-index: 1;
+    min-height: 3px;
+}
+
+/* Larger inset for selected steps with thicker borders */
+.step.selected.has-velocity::after {
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    height: calc(var(--velocity-height, 100%) - 6px);
+    max-height: calc(100% - 6px);
+}
+
+.subdivision-step.has-velocity {
+    position: relative;
+    overflow: hidden;
+    background: #345;
+}
+
+.subdivision-step.has-velocity::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: #05f;
+    height: calc(var(--velocity-height, 100%) - 4px);
+    max-height: calc(100% - 4px);
+    transition: height 0.1s ease;
+    pointer-events: none;
+    z-index: 1;
+    min-height: 3px;
+}
+
+/* Larger inset for selected subdivision steps */
+.subdivision-step.selected.has-velocity::after {
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    height: calc(var(--velocity-height, 100%) - 6px);
+    max-height: calc(100% - 6px);
+}
+
+.step.has-velocity.active {
+    background: #456;
+}
+
+.subdivision-step.has-velocity.active {
+    background: #345;
+}
+
+/* Velocity background for minimized tracks */
+.step.has-velocity-bg {
+    background: #05f !important;
+}
+
+.subdivision-step.has-velocity-bg {
+    background: #05f !important;
+}
+
+.step.has-velocity-bg.active {
+    background: #05f !important;
+}
+
+.subdivision-step.has-velocity-bg.active {
+    background: #05f !important;
+}
+
+/* Hide velocity fill visualization for minimized tracks */
+.track-row.minimized .step.has-velocity::after,
+.track-row.minimized .subdivision-step.has-velocity::after {
+    display: none;
+}
+
+.track-row.minimized .step.has-velocity,
+.track-row.minimized .subdivision-step.has-velocity {
+    background: #456;
+}
+
+.track-row.minimized .subdivision-step.has-velocity {
+    background: #345;
+}
+
+/* ==========================================================================
+   STEP PROPERTIES INDICATORS
+   ========================================================================== */
+
+.step.has-props::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background: #0af;
+    border-radius: 50%;
+    z-index: 12;
+}
+
+.step.has-velocity.has-props::before,
+.step.has-velocity-bg.has-props::before,
+.step.has-pitch.has-props::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background: #0af;
+    border-radius: 50%;
+    z-index: 12;
+}
+
+.subdivision-step.has-props::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 4px;
+    height: 4px;
+    background: #0af;
+    border-radius: 50%;
+    z-index: 12;
+}
+
+.subdivision-step.has-velocity.has-props::before,
+.subdivision-step.has-velocity-bg.has-props::before,
+.subdivision-step.has-pitch.has-props::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 4px;
+    height: 4px;
+    background: #0af;
+    border-radius: 50%;
+    z-index: 12;
+}
+
+/* ==========================================================================
+   CURSOR STYLES
+   ========================================================================== */
+
+body.melody-mode .step.has-pitch,
+body.melody-mode .subdivision-step.has-pitch,
+body.melody-mode .step.selected,
+body.melody-mode .subdivision-step.selected {
+    cursor: ns-resize;
+}
+
+body .step.has-velocity,
+body .step.has-velocity-bg,
+body .subdivision-step.has-velocity,
+body .subdivision-step.has-velocity-bg,
+body .step.selected,
+body .subdivision-step.selected {
+    cursor: ns-resize;
+}
+
+/* Visual feedback for editing */
+body.melody-mode .step.selected:hover,
+body.melody-mode .subdivision-step.selected:hover,
+body .step.selected:hover,
+body .subdivision-step.selected:hover {
+    box-shadow: inset 0 0 0 1px rgba(0, 170, 255, 0.5);
+}
+
+/* ==========================================================================
+   MODALS
+   ========================================================================== */
+
+/* JSON Modal */
+#json-modal,
+#import-modal,
+#midi-modal,
+#help-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+}
+
+#json-modal.show,
+#import-modal.show,
+#midi-modal.show,
+#help-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#json-content,
+#import-content,
+#midi-content,
+#help-content {
+    background: #234;
+    border: 2px solid #567;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#json-content,
+#import-content {
+    width: 90%;
+    height: 90%;
+}
+
+#midi-content {
+    width: 500px;
+    max-height: 600px;
+}
+
+#help-content {
+    width: 90%;
+    max-width: 800px;
+    height: 90%;
+    max-height: 700px;
+}
+
+#json-header,
+#import-header,
+#midi-header,
+#help-header {
+    background: #345;
+    padding: 15px 20px;
+    border-bottom: 1px solid #567;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px 6px 0 0;
+}
+
+#json-title,
+#import-title,
+#midi-title,
+#help-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    margin: 0;
+}
+
+#json-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#json-copy {
+    background: #567;
+    border: 1px solid #789;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}

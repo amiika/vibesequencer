@@ -1,3 +1,7 @@
+/* ==========================================================================
+   BASE STYLES
+   ========================================================================== */
+
 body {
     background: #234;
     color: #fff;
@@ -5,6 +9,23 @@ body {
     margin: 0;
     padding: 20px;
 }
+
+button {
+    padding: 8px 16px;
+    background: #567;
+    color: #fff;
+    border: 1px solid #888;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background: #678;
+}
+
+/* ==========================================================================
+   MENU BAR
+   ========================================================================== */
 
 #menu {
     display: flex;
@@ -21,7 +42,257 @@ body {
     font-weight: bold;
 }
 
-/* Context Menu */
+.right-menu {
+    margin-left: auto;
+}
+
+#follow-button {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+#follow-button:hover {
+    background: #567;
+}
+
+#follow-button.active {
+    color: #fff;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   SECTION TABS
+   ========================================================================== */
+
+.section-tabs {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 5px;
+    border: 1px solid #567;
+    background: #234;
+}
+
+.section-tab {
+    background: #345;
+    border-right: 1px solid #567;
+    padding: 8px 20px 8px 16px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    color: #aaa;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 100px;
+    justify-content: center;
+    position: relative;
+}
+
+.section-tab:last-child {
+    border-right: none;
+}
+
+.section-tab:hover {
+    background: #456;
+    color: #fff;
+}
+
+.section-tab.active {
+    background: #567;
+    color: #0af;
+    border-bottom: 2px solid #0af;
+}
+
+.section-tab-name {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: inherit;
+}
+
+.section-tab-close {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    font-size: 10px;
+    background: #f44;
+    border: none;
+    cursor: pointer;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: background 0.2s;
+}
+
+.section-tab-close:hover {
+    background: #f66;
+}
+
+/* Playing section indicators */
+.section-tab.playing {
+    border: 2px solid rgb(78, 85, 70) !important;
+    background: #345;
+    color: inherit;
+}
+
+.section-tab.playing:hover {
+    background: #456 !important;
+}
+
+.section-tab.active.playing {
+    background: #567 !important;
+    color: #0af !important;
+    border: 2px solid #692 !important;
+    border-bottom: 2px solid #0af !important;
+}
+
+.section-tab.playing .section-tab-name::before {
+    content: '▶ ';
+    color: rgb(87, 129, 32);
+    font-size: 10px;
+    margin-right: 4px;
+}
+
+.section-tab.playing .section-tab-close {
+    background: #f44;
+}
+
+.section-tab.playing:hover .section-tab-close {
+    background: #f66;
+}
+
+/* Shadow section tab for adding new sections */
+.shadow-section-tab {
+    background: #234;
+    border-right: 1px solid #567;
+    border: 2px dashed #567;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #666;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    opacity: 0.6;
+}
+
+.shadow-section-tab:hover {
+    background: #345;
+    border-color: #0af;
+    color: #0af;
+    opacity: 0.9;
+}
+
+/* Section info display */
+.section-info {
+    background: #567 !important;
+    border-color: #789 !important;
+    font-weight: bold;
+    color: #fff !important;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 5px;
+    padding: 8px 15px;
+}
+
+.section-display {
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+}
+
+/* Section control styling */
+.section-name-control,
+.section-repeat-control, 
+.section-bpm-control {
+    background: #567;
+    color: #fff;
+    border: 1px solid #789;
+}
+
+.section-name-control:focus,
+.section-repeat-control:focus,
+.section-bpm-control:focus {
+    outline: 1px solid #0af;
+    background: #678;
+}
+
+
+/* Clone track button styling */
+.clone-track-button {
+    background: #469;
+    border: 1px solid #5a9;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clone-track-button:hover:not(:disabled) {
+    background: #57a;
+    border-color: #6ba;
+}
+
+.clone-track-button:disabled {
+    background: #333;
+    border-color: #555;
+    color: #777;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Clear buttons styling */
+.clear-section-button,
+.clear-all-button {
+    background: #d44;
+    border: 1px solid #f66;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clear-section-button:hover,
+.clear-all-button:hover {
+    background: #f55;
+    border-color: #f88;
+}
+
+.clear-all-button {
+    background: #a22;
+    border-color: #d44;
+}
+
+.clear-all-button:hover {
+    background: #c33;
+    border-color: #f55;
+}
+
+
+/* ==========================================================================
+   CONTEXT MENU
+   ========================================================================== */
+
 #context-menu {
     background: #345;
     border: 2px solid #567;
@@ -65,770 +336,72 @@ body {
     color: #0af;
 }
 
-/* Context Content */
-.context-content {
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+/* Tab-specific styling */
+.context-tab[data-tab="section"] {
+    color: rgb(0, 123, 21);
 }
 
-.context-tab-panel {
-    display: none;
-}
-
-.context-tab-panel.active {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.context-section.title {
-    background: #345;
-    border-color: #567;
-    font-weight: bold;
-    color: #0af;
-    width: 95%;
-    justify-content: center;
-    margin-bottom: 5px;
-}
-
-.context-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.context-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 5px 10px;
-    background: #456;
-    border-radius: 3px;
-    border: 1px solid #678;
-}
-
-.context-section.active {
-    border-color: #0af;
+.context-tab[data-tab="section"].active {
     background: #567;
+    color: rgb(43, 255, 0);
+    border-bottom: 2px solid rgb(0, 255, 255);
 }
 
-.context-label {
-    font-weight: bold;
-    font-size: 12px;
-    color: #aaa;
+.context-tab[data-tab="rhythm"] {
+    color: rgb(124, 135, 255);
 }
 
-.context-value {
-    font-size: 12px;
-    color: #fff;
-}
-
-.param-input {
-    width: 50px;
-    padding: 2px 4px;
-    font-size: 11px;
-    text-align: center;
+.context-tab[data-tab="rhythm"].active {
     background: #567;
-    color: #fff;
-    border: 1px solid #789;
+    color: rgb(190, 147, 253);
+    border-bottom: 2px solid rgb(0, 255, 255);
 }
 
-/* Shadow Track Row */
-.shadow-track-row {
-    display: flex;
-    align-items: stretch;
-    border-bottom: 1px solid #567;
-    min-height: 40px;
-    opacity: 0.6;
-    transition: opacity 0.2s ease;
-    cursor: pointer;
+.context-tab[data-tab="melody"] {
+    color: rgb(254, 0, 0);
 }
 
-.shadow-track-row:hover {
-    opacity: 0.9;
-}
-
-/* Shadow Track Header */
-.shadow-track-header {
-    width: 150px;
-    background: #234; /* Darker than regular tracks */
-    border-right: 1px solid #567;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    border: 2px dashed #567;
-    border-right: 1px solid #567; /* Keep right border solid */
-    transition: all 0.2s ease;
-}
-
-.shadow-track-row:hover .shadow-track-header {
-    background: #345;
-    border-color: #0af;
-}
-
-.shadow-track-text {
-    font-size: 12px;
-    color: #666;
-    text-align: center;
-    font-weight: bold;
-    transition: color 0.2s ease;
-}
-
-.shadow-track-row:hover .shadow-track-text {
-    color: #0af;
-}
-
-/* Shadow Track Steps */
-.shadow-track-steps {
-    display: flex;
-    flex: 1;
-    background: #234; /* Darker than regular steps */
-    border: 2px dashed #567;
-    border-left: none;
-    position: relative;
-    transition: all 0.2s ease;
-}
-
-.shadow-track-row:hover .shadow-track-steps {
-    border-color: #0af;
-    background: #345;
-}
-
-.shadow-track-steps::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #666;
-    font-size: 12px;
-    font-style: italic;
-    pointer-events: none;
-    transition: color 0.2s ease;
-}
-
-.shadow-track-row:hover .shadow-track-steps::before {
-    color: #0af;
-}
-
-.operation-button {
-    padding: 4px 8px;
-    font-size: 11px;
+.context-tab[data-tab="melody"].active {
     background: #567;
-    border: 1px solid #789;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 3px;
+    color: rgb(255, 119, 0);
+    border-bottom: 2px solid rgb(0, 255, 255);
 }
 
-.operation-button:hover {
-    background: #678;
-}
-
-.operation-button.active {
-    background: #0af;
-    border-color: #0cf;
-}
-
-button {
-    padding: 8px 16px;
-    background: #567;
-    color: #fff;
-    border: 1px solid #888;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-button:hover {
-    background: #678;
-}
-
-/* Track Layout */
-.track-container {
-    border: 1px solid #567;
-}
-
-.track-row {
-    display: flex;
-    align-items: stretch;
-    border-bottom: 1px solid #567;
-    min-height: 40px;
-}
-
-.track-row:last-child {
-    border-bottom: none;
-}
-
-.track-header {
-    width: 150px;
-    background: #345;
-    border-right: 1px solid #567;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    position: relative;
-    cursor: pointer;
-    gap: 4px;
-}
-
-.track-header.selected {
-    outline: 2px solid #0af;
-    outline-offset: -2px;
-    background: #456;
-}
-
-.track-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.track-control-row {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 10px;
-}
-
-.track-name-input {
-    border: 1px solid #678;
-    padding: 1px 3px;
-    font-size: 10px;
-    border-radius: 2px;
-    width: 110px;
-    height: 20px;
-}
-
-.track-control-input {
-    background: #456;
-    border: 1px solid #678;
-    color: #fff;
-    padding: 1px 3px;
-    font-size: 10px;
-    border-radius: 2px;
-    width: 30px;
-    height: 20px;
-    text-align: center;
-}
-
-/* Remove default number input spinners */
-.track-control-input::-webkit-outer-spin-button,
-.track-control-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.track-control-input:focus {
-    outline: 1px solid #0af;
-    background: #567;
-}
-
-.track-control-label {
-    color: #aaa;
-    min-width: 35px;
-}
-
-.track-control-checkbox {
-    margin: 0;
-}
-
-.track-button {
-    background: #456;
-    border: 1px solid #678;
-    color: #fff;
-    padding: 2px 6px;
-    font-size: 9px;
-    border-radius: 2px;
-    cursor: pointer;
-}
-
-.track-button:hover {
-    background: #567;
-}
-
-.track-button.clone {
-    background: #469;
-}
-
-.track-button.clone:hover {
-    background: #57a;
-}
-
-.minimize-button {
-    position: absolute;
-    top: 2px;
-    right: 20px;
-    width: 16px;
-    height: 16px;
-    padding: 0;
-    font-size: 10px;
-    background: #456;
-    border: 1px solid #678;
-}
-
-.remove-button {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 16px;
-    height: 16px;
-    padding: 0;
-    font-size: 10px;
-    background: #f44;
-    border: none;
-    cursor: pointer;
-}
-
-.remove-button:hover {
-    background: #f66;
-}
-
-/* Confirmation Dialog */
-#confirm-dialog {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-}
-
-#confirm-dialog.show {
-    display: flex;
-}
-
-.confirm-content {
-    background: #234;
-    border: 2px solid #567;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-    min-width: 300px;
-}
-
-.confirm-title {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #fff;
-}
-
-.confirm-message {
-    font-size: 14px;
-    margin-bottom: 20px;
-    color: #ccc;
-}
-
-.confirm-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
-.confirm-button {
-    padding: 8px 16px;
-    border: 1px solid #678;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.confirm-button.yes {
-    background: #f44;
-    color: #fff;
-}
-
-.confirm-button.yes:hover {
-    background: #f66;
-}
-
-.confirm-button.no {
-    background: #456;
-    color: #fff;
-}
-
-.confirm-button.no:hover {
-    background: #567;
-}
-
-.operations-display {
-    font-size: 10px;
-    color: #999;
-    margin-top: 2px;
-}
-
-/* Step Layout */
-.steps-container {
-    display: flex;
-    flex: 1;
-}
-
-.step {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #456;
-    cursor: pointer;
-    position: relative;
-    min-height: 38px;
-    border-right: 1px solid #567;
-}
-
-.step:last-child {
-    border-right: none;
-}
-
-.step.active {
-    background: #e02;
-}
-
-.step.selected {
-    outline: 2px solid #0af;
-    outline-offset: -2px;
-}
-
-/* Enhanced pitch visualization styles */
-.step.has-pitch {
-    position: relative;
-    overflow: hidden;
-    background: #456; /* Ensure background for inactive steps */
-}
-
-.step.has-pitch::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #e02;
-    height: var(--pitch-height, 100%);
-    transition: height 0.1s ease;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.subdivision-step.has-pitch {
-    position: relative;
-    overflow: hidden;
-    background: #345; /* Ensure background for inactive subdivision steps */
-}
-
-.subdivision-step.has-pitch::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #e02;
-    height: var(--pitch-height, 100%);
-    transition: height 0.1s ease;
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* Remove the active class background when showing pitch */
-.step.has-pitch.active {
-    background: #456; /* Keep same background as non-active */
-}
-
-.subdivision-step.has-pitch.active {
-    background: #345; /* Keep same background as non-active */
-}
-
-/* Ensure the red bar is always visible, even for very small heights */
-.step.has-pitch::before,
-.subdivision-step.has-pitch::before {
-    min-height: 3px; /* Minimum visible height for 0 pitch */
-}
-
-/* Props indicator should be above pitch visualization */
-.step.has-props::after,
-.subdivision-step.has-props::after {
-    z-index: 2;
-    position: relative;
-}
-
-/* Cursor styles for melody mode */
-body.melody-mode .step.has-pitch,
-body.melody-mode .subdivision-step.has-pitch {
-    cursor: ns-resize; /* North-south resize cursor for vertical dragging */
-}
-
-/* Only show melody cursor for selected steps */
-body.melody-mode .step.selected,
-body.melody-mode .subdivision-step.selected {
-    cursor: ns-resize;
-}
-
-/* Hide pitch visualization for minimized tracks */
-.track-row.minimized .step.has-pitch::before,
-.track-row.minimized .subdivision-step.has-pitch::before {
-    display: none;
-}
-
-/* Remove has-pitch class styling for minimized tracks */
-.track-row.minimized .step.has-pitch,
-.track-row.minimized .subdivision-step.has-pitch {
-    background: #456; /* Regular step background */
-}
-
-.track-row.minimized .subdivision-step.has-pitch {
-    background: #345; /* Regular subdivision step background */
-}
-
-/* Ensure active steps show normally in minimized tracks */
-.track-row.minimized .step.active {
-    background: #e02;
-}
-
-.track-row.minimized .subdivision-step.active {
-    background: #e02;
-}
-
-/* Improve selection visibility in melody mode */
-body.melody-mode .step.selected.has-pitch,
-body.melody-mode .subdivision-step.selected.has-pitch {
-    outline: 2px solid #0af;
-    outline-offset: -2px;
-}
-
-/* Add visual feedback for pitch editing */
-body.melody-mode .step.selected:hover,
-body.melody-mode .subdivision-step.selected:hover {
-    box-shadow: inset 0 0 0 1px rgba(0, 170, 255, 0.5);
-}
-
-/* Make subdivision selection more visible */
-.subdivision-selected {
-    outline: 3px solid #0af !important;
-    outline-offset: -3px !important;
-    background: rgba(0, 170, 255, 0.1) !important;
-    position: relative;
-}
-
-/* Ensure subdivision container has proper positioning */
-.subdivision {
-    position: relative;
-    display: flex;
-    width: 100%;
-    height: 100%;
-}
-
-/* Make sure the selection outline is above other elements */
-.subdivision-selected::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border: 2px solid #0af;
-    pointer-events: none;
-    z-index: 10;
-}
-
-/* Alternative: Use background color for selection */
-.subdivision.subdivision-selected {
-    background: rgba(0, 170, 255, 0.15) !important;
-}
-
-.subdivision-substeps-selected {
-    outline: 2px dashed #0af !important;
-    outline-offset: -2px;
-    position: relative;
-}
-
-.subdivision-container {
-    position: relative;
-}
-
-.step.has-props::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 6px;
-    height: 6px;
-    background: #0af;
-    border-radius: 50%;
-}
-
-/* Subdivision Styles */
-.subdivision {
-    display: flex;
-    width: 100%;
-    height: 100%;
-}
-
-.subdivision-step {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #345;
-    cursor: pointer;
-    font-size: 10px;
-    border-right: 1px solid #567;
-}
-
-.subdivision-step:last-child {
-    border-right: none;
-}
-
-.subdivision-step.active {
-    background: #e02;
-}
-
-.subdivision-step.selected {
-    outline: 2px solid #0af;
-    outline-offset: -2px;
-}
-
-.subdivision-step.has-props::after {
-    content: '';
-    position: absolute;
-    top: 1px;
-    right: 1px;
-    width: 4px;
-    height: 4px;
-    background: #0af;
-    border-radius: 50%;
-}
-
-/* Nested subdivisions */
-.subdivision .subdivision {
-    border-top: 1px solid #567;
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.subdivision .subdivision .subdivision-step {
-    background: #234;
-    font-size: 8px;
-    border-right: 1px solid #456;
-}
-
-.subdivision .subdivision .subdivision-step:last-child {
-    border-right: none;
-}
-
-.subdivision .subdivision .subdivision-step.active {
-    background: #c01;
-}
-
-.subdivision .subdivision .subdivision-step.selected {
-    outline: 2px solid #0af;
-    outline-offset: -2px;
-}
-
-.subdivision-label {
-    position: absolute;
-    bottom: 1px;
-    right: 1px;
-    font-size: 8px;
-    color: #666;
-    background: rgba(0,0,0,0.7);
-    padding: 1px 2px;
-    border-radius: 2px;
-    z-index: 3; /* Above pitch visualization */
-}
-
-/* Index Row */
-.index-row {
-    display: flex;
-    margin-bottom: 5px;
-}
-
-.index-header {
-    width: 150px;
-    background: #234;
-    border: 1px solid #567;
-    padding: 8px;
-    text-align: center;
-    font-weight: bold;
-}
-
-.index-steps {
-    display: flex;
-    flex: 1;
-    border: 1px solid #567;
-    border-left: none;
-}
-
-.index-step {
-    flex: 1;
-    text-align: center;
-    padding: 5px;
-    background: #345;
-    font-size: 12px;
-    border-right: 1px solid #567;
-}
-
-.index-step:last-child {
-    border-right: none;
-}
-
-.index-step.current {
-    background: #ff8;
-    color: #000;
-}
-
-/* JSON Modal */
-#json-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-}
-
-#json-modal.show {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#json-content {
-    background: #234;
-    border: 2px solid #567;
-    border-radius: 8px;
-    width: 90%;
-    height: 90%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-#json-header {
-    background: #345;
-    padding: 15px 20px;
-    border-bottom: 1px solid #567;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 6px 6px 0 0;
-}
-
-#json-title {
+#json-title,
+#import-title,
+#midi-title,
+#help-title {
     font-size: 18px;
     font-weight: bold;
     color: #fff;
+    margin: 0;
 }
 
-#json-close {
+#json-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#json-copy {
+    background: #567;
+    border: 1px solid #789;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+#json-copy:hover {
+    background: #678;
+}
+
+#json-close,
+#import-close,
+#midi-close,
+#help-close {
     background: #f44;
     border: none;
     color: #fff;
@@ -838,20 +411,30 @@ body.melody-mode .subdivision-step.selected:hover {
     font-size: 14px;
 }
 
-#json-close:hover {
+#json-close:hover,
+#import-close:hover,
+#midi-close:hover,
+#help-close:hover {
     background: #f66;
 }
 
-#json-display {
+#json-display,
+#import-display,
+#midi-settings,
+#help-display {
     flex: 1;
     padding: 20px;
     overflow: auto;
+    color: #fff;
+    background: #234;
+    border-radius: 0 0 6px 6px;
+}
+
+#json-display {
     font-family: 'Courier New', monospace;
     font-size: 12px;
     line-height: 1.4;
-    color: #fff;
     background: #123;
-    border-radius: 0 0 6px 6px;
 }
 
 #json-display pre {
@@ -860,7 +443,97 @@ body.melody-mode .subdivision-step.selected:hover {
     word-wrap: break-word;
 }
 
-/* JSON Syntax Highlighting */
+#import-display {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#import-instructions {
+    font-size: 14px;
+    color: #ccc;
+}
+
+#import-instructions p {
+    margin: 0;
+}
+
+#import-textarea {
+    flex: 1;
+    min-height: 200px;
+    background: #123;
+    color: #fff;
+    border: 1px solid #567;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    resize: vertical;
+}
+
+#import-textarea:focus {
+    outline: 1px solid #0af;
+    background: #134;
+}
+
+#import-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#import-execute {
+    background: #469;
+    border: 1px solid #57a;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#import-execute:hover {
+    background: #57a;
+}
+
+#import-clear {
+    background: #567;
+    border: 1px solid #789;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#import-clear:hover {
+    background: #678;
+}
+
+#import-status {
+    font-size: 14px;
+    font-weight: bold;
+    min-height: 20px;
+}
+
+#import-button {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+#import-button:hover {
+    background: #567;
+}
+
+/* ==========================================================================
+   JSON SYNTAX HIGHLIGHTING
+   ========================================================================== */
+
 .json-key {
     color: #9cdcfe;
 }
@@ -885,73 +558,9 @@ body.melody-mode .subdivision-step.selected:hover {
     color: #cccccc;
 }
 
-/* MIDI Modal */
-#midi-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-}
-
-#midi-modal.show {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#midi-content {
-    background: #234;
-    border: 2px solid #567;
-    border-radius: 8px;
-    width: 500px;
-    max-height: 600px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-#midi-header {
-    background: #345;
-    padding: 15px 20px;
-    border-bottom: 1px solid #567;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 6px 6px 0 0;
-}
-
-#midi-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-}
-
-#midi-close {
-    background: #f44;
-    border: none;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-#midi-close:hover {
-    background: #f66;
-}
-
-#midi-settings {
-    flex: 1;
-    padding: 20px;
-    overflow: auto;
-    color: #fff;
-    background: #234;
-    border-radius: 0 0 6px 6px;
-}
+/* ==========================================================================
+   MIDI MODAL SPECIFIC STYLES
+   ========================================================================== */
 
 .midi-section {
     margin-bottom: 20px;
@@ -1030,7 +639,8 @@ body.melody-mode .subdivision-step.selected:hover {
     background: #678;
 }
 
-#json-button, #midi-button {
+#json-button,
+#midi-button {
     float: right;
     top: 20px;
     background: #456;
@@ -1051,128 +661,15 @@ body.melody-mode .subdivision-step.selected:hover {
     right: 120px;
 }
 
-#json-button:hover, #midi-button:hover {
+#json-button:hover,
+#midi-button:hover {
     background: #567;
 }
 
-.track-control-with-buttons {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-}
+/* ==========================================================================
+   HELP MODAL SPECIFIC STYLES
+   ========================================================================== */
 
-.track-control-button {
-    background: #456;
-    border: 1px solid #678;
-    color: #fff;
-    padding: 1px 4px;
-    font-size: 9px;
-    border-radius: 2px;
-    cursor: pointer;
-    width: 17px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.track-control-button:hover {
-    background: #567;
-}
-
-.track-row.minimized {
-    min-height: 20px;
-}
-
-.track-row.minimized .track-header {
-    padding: 4px 8px;
-}
-
-.track-row.minimized .track-name {
-    font-size: 10px;
-    margin-bottom: 0;
-}
-
-.track-row.minimized .track-controls {
-    display: none;
-}
-
-.track-row.minimized .step {
-    min-height: 18px;
-}
-
-/* Help Modal Styles */
-#help-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-}
-
-#help-modal.show {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#help-content {
-    background: #234;
-    border: 2px solid #567;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 800px;
-    height: 90%;
-    max-height: 700px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-#help-header {
-    background: #345;
-    padding: 15px 20px;
-    border-bottom: 1px solid #567;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 6px 6px 0 0;
-}
-
-#help-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-    margin: 0;
-}
-
-#help-close {
-    background: #f44;
-    border: none;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-#help-close:hover {
-    background: #f66;
-}
-
-#help-display {
-    flex: 1;
-    padding: 20px;
-    overflow: auto;
-    color: #fff;
-    background: #234;
-    border-radius: 0 0 6px 6px;
-}
-
-/* Help Content Sections */
 .help-section {
     margin-bottom: 25px;
 }
@@ -1210,7 +707,6 @@ body.melody-mode .subdivision-step.selected:hover {
     color: #ccc;
 }
 
-/* Keyboard shortcut styling */
 kbd {
     background: #456;
     border: 1px solid #678;
@@ -1223,7 +719,6 @@ kbd {
     white-space: nowrap;
 }
 
-/* Menu button styling */
 .menu-button {
     background: #456;
     border: 1px solid #678;
@@ -1239,7 +734,6 @@ kbd {
     background: #567;
 }
 
-/* Scrollbar styling for help content */
 #help-display::-webkit-scrollbar {
     width: 8px;
 }
@@ -1258,7 +752,133 @@ kbd {
     background: #678;
 }
 
-/* Responsive adjustments */
+/* ==========================================================================
+   CONFIRMATION DIALOG - MUST BE HIDDEN BY DEFAULT
+   ========================================================================== */
+
+#confirm-dialog {
+    display: none !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+#confirm-dialog.show {
+    display: flex !important;
+}
+
+.confirm-content {
+    background: #234;
+    border: 2px solid #567;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    min-width: 300px;
+}
+
+.confirm-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.confirm-message {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #ccc;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.confirm-button {
+    padding: 8px 16px;
+    border: 1px solid #678;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.confirm-button.yes {
+    background: #f44;
+    color: #fff;
+}
+
+.confirm-button.yes:hover {
+    background: #f66;
+}
+
+.confirm-button.no {
+    background: #456;
+    color: #fff;
+}
+
+.confirm-button.no:hover {
+    background: #567;
+}
+/* GitHub corner triangle container */
+#github-link {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    z-index: 999;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    overflow: hidden;
+}
+
+/* Triangle background */
+#github-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 50px solid #567;
+    border-left: 50px solid transparent;
+    transition: border-top-color 0.2s ease;
+}
+
+#github-link:hover::before {
+    border-top-color: #0af;
+}
+
+#github-link:hover {
+    transform: scale(1.1);
+}
+
+/* Icon positioned absolutely within the container */
+#github-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    filter: brightness(0.9);
+    transition: filter 0.2s ease;
+    z-index: 1;
+}
+
+#github-link:hover #github-icon {
+    filter: brightness(1.2) drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+}
+/* ==========================================================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================================================== */
+
 @media (max-width: 768px) {
     #help-content {
         width: 95%;
@@ -1272,4 +892,1030 @@ kbd {
     .help-content {
         font-size: 12px;
     }
+}
+
+/* ==========================================================================
+   CONTEXT MENU STYLES
+   ========================================================================== */
+.context-tab {
+    padding: 8px 16px;
+    cursor: pointer;
+    background: #345;
+    border-right: 1px solid #567;
+    font-size: 12px;
+    font-weight: bold;
+    color: #aaa;
+    transition: all 0.2s;
+}
+
+.context-tab:last-child {
+    border-right: none;
+}
+
+.context-tab:hover {
+    background: #456;
+    color: #fff;
+}
+
+.context-tab.active {
+    background: #567;
+    color: #0af;
+}
+
+/* Context content */
+.context-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.context-tab-panel {
+    display: none;
+}
+
+.context-tab-panel.active {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.context-section.title {
+    background: #345;
+    border-color: #567;
+    font-weight: bold;
+    color: #0af;
+    width: 95%;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+.context-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.context-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px;
+    background: #456;
+    border-radius: 3px;
+    border: 1px solid #678;
+}
+
+.context-section.active {
+    border-color: #0af;
+    background: #567;
+}
+
+.context-label {
+    font-weight: bold;
+    font-size: 12px;
+    color: #aaa;
+}
+
+.context-value {
+    font-size: 12px;
+    color: #fff;
+}
+
+.param-input {
+    width: 50px;
+    padding: 2px 4px;
+    font-size: 11px;
+    text-align: center;
+    background: #567;
+    color: #fff;
+    border: 1px solid #789;
+}
+
+.operation-button {
+    padding: 4px 8px;
+    font-size: 11px;
+    background: #567;
+    border: 1px solid #789;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.operation-button:hover {
+    background: #678;
+}
+
+.operation-button.active {
+    background: #0af;
+    border-color: #0cf;
+}
+
+.operation-button.clone {
+    background: #469;
+    border: 1px solid #5a9;
+}
+
+.operation-button.clone:hover {
+    background: #57a;
+}
+
+/* ==========================================================================
+   INDEX ROW
+   ========================================================================== */
+
+.index-row {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.index-header {
+    width: 150px;
+    background: #234;
+    border: 1px solid #567;
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.index-steps {
+    display: flex;
+    flex: 1;
+    border: 1px solid #567;
+    border-left: none;
+}
+
+.index-step {
+    flex: 1;
+    text-align: center;
+    padding: 5px;
+    background: #345;
+    font-size: 12px;
+    border-right: 1px solid #567;
+}
+
+.index-step:last-child {
+    border-right: none;
+}
+
+.index-step.current {
+    background: #ff8;
+    color: #000;
+}
+
+/* ==========================================================================
+   TRACK CONTAINER
+   ========================================================================== */
+
+.track-container {
+    border: 1px solid #567;
+}
+
+.track-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid #567;
+    min-height: 40px;
+}
+
+.track-row:last-child {
+    border-bottom: none;
+}
+
+.track-row.minimized {
+    min-height: 30px;
+}
+
+/* ==========================================================================
+   TRACK HEADERS
+   ========================================================================== */
+
+.track-name-input-small {
+    border: 1px solid #678;
+    padding: 1px 3px;
+    font-size: 10px;
+    border-radius: 2px;
+    width: 80px;
+    height: 20px;
+    background: #456;
+    color: #fff;
+}
+
+.track-name-input-small:focus {
+    outline: 1px solid #0af;
+    background: #567;
+}
+
+.track-header {
+    width: 150px;
+    background: #345;
+    border-right: 1px solid #567;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+    cursor: pointer;
+    gap: 4px;
+}
+
+.track-header.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+    background: #456;
+}
+
+.track-row.minimized .track-header {
+    padding: 4px 8px;
+}
+
+.track-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.track-row.minimized .track-controls {
+    display: none;
+}
+
+.track-control-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+}
+
+.track-name-input {
+    border: 1px solid #678;
+    padding: 1px 3px;
+    font-size: 10px;
+    border-radius: 2px;
+    width: 110px;
+    height: 20px;
+}
+
+.track-control-input {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 1px 3px;
+    font-size: 10px;
+    border-radius: 2px;
+    width: 30px;
+    height: 20px;
+    text-align: center;
+}
+
+.track-control-input::-webkit-outer-spin-button,
+.track-control-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.track-control-input:focus {
+    outline: 1px solid #0af;
+    background: #567;
+}
+
+.track-control-label {
+    color: #aaa;
+    min-width: 20px;
+}
+
+.track-control-checkbox {
+    margin: 0;
+}
+
+.track-button {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 2px 6px;
+    font-size: 9px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.track-button:hover {
+    background: #567;
+}
+
+.track-button.clone {
+    background: #469;
+}
+
+.track-button.clone:hover {
+    background: #57a;
+}
+
+.track-control-with-buttons {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.track-control-button {
+    background: #456;
+    border: 1px solid #678;
+    color: #fff;
+    padding: 1px 4px;
+    font-size: 9px;
+    border-radius: 2px;
+    cursor: pointer;
+    width: 17px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.track-control-button:hover {
+    background: #567;
+}
+
+.minimize-button {
+    position: absolute;
+    top: 2px;
+    right: 20px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    font-size: 10px;
+    background: #456;
+    border: 1px solid #678;
+}
+
+.remove-button {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    font-size: 10px;
+    background: #f44;
+    border: none;
+    cursor: pointer;
+}
+
+.remove-button:hover {
+    background: #f66;
+}
+
+/* ==========================================================================
+   SHADOW TRACK (ADD NEW TRACK)
+   ========================================================================== */
+
+.shadow-track-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid #567;
+    min-height: 40px;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.shadow-track-row:hover {
+    opacity: 0.9;
+}
+
+.shadow-track-header {
+    width: 150px;
+    background: #234;
+    border-right: 1px solid #567;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border: 2px dashed #567;
+    border-right: 1px solid #567;
+    transition: all 0.2s ease;
+}
+
+.shadow-track-row:hover .shadow-track-header {
+    background: #345;
+    border-color: #0af;
+}
+
+.shadow-track-text {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.shadow-track-row:hover .shadow-track-text {
+    color: #0af;
+}
+
+.shadow-track-steps {
+    display: flex;
+    flex: 1;
+    background: #234;
+    border: 2px dashed #567;
+    border-left: none;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.shadow-track-row:hover .shadow-track-steps {
+    border-color: #0af;
+    background: #345;
+}
+
+/* ==========================================================================
+   STEPS AND SUBDIVISIONS
+   ========================================================================== */
+
+.steps-container {
+    display: flex;
+    flex: 1;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #456;
+    cursor: pointer;
+    position: relative;
+    min-height: 38px;
+    border-right: 1px solid #567;
+}
+
+.step:last-child {
+    border-right: none;
+}
+
+.track-row.minimized .step {
+    min-height: 18px;
+}
+
+.step.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+    position: relative;
+    z-index: 10;
+}
+
+.subdivision-step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #345;
+    cursor: pointer;
+    font-size: 10px;
+    border-right: 1px solid #567;
+    position: relative;
+}
+
+.subdivision-step:last-child {
+    border-right: none;
+}
+
+.subdivision-step.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Enhanced selection visibility for selected steps with visualizations */
+.step.selected.has-pitch,
+.step.selected.has-velocity,
+.step.selected.has-velocity-bg,
+.subdivision-step.selected.has-pitch,
+.subdivision-step.selected.has-velocity,
+.subdivision-step.selected.has-velocity-bg {
+    outline: 3px solid #0af !important;
+    outline-offset: -3px !important;
+    z-index: 10;
+}
+
+/* Make sure nested subdivision selections work properly */
+.subdivision .subdivision .subdivision-step.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+    z-index: 10;
+}
+
+.subdivision {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.subdivision-selected {
+    outline: 3px solid #0af !important;
+    outline-offset: -3px !important;
+    background: rgba(0, 170, 255, 0.1) !important;
+    position: relative;
+    z-index: 10;
+}
+
+.subdivision-selected::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid #0af;
+    pointer-events: none;
+    z-index: 11;
+}
+
+.subdivision.subdivision-selected {
+    background: rgba(0, 170, 255, 0.15) !important;
+}
+
+.subdivision-substeps-selected {
+    outline: 2px dashed #0af !important;
+    outline-offset: -2px;
+    position: relative;
+}
+
+.subdivision-container {
+    position: relative;
+}
+
+/* Nested subdivisions */
+.subdivision .subdivision {
+    border-top: 1px solid #567;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.subdivision .subdivision .subdivision-step {
+    background: #234;
+    font-size: 8px;
+    border-right: 1px solid #456;
+}
+
+.subdivision .subdivision .subdivision-step:last-child {
+    border-right: none;
+}
+
+.subdivision .subdivision .subdivision-step.selected {
+    outline: 2px solid #0af;
+    outline-offset: -2px;
+}
+
+.subdivision-label {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    font-size: 8px;
+    color: #666;
+    background: rgba(0,0,0,0.7);
+    padding: 1px 2px;
+    border-radius: 2px;
+    z-index: 5;
+}
+
+/* ==========================================================================
+   STEP COLORS BY CONTEXT TAB
+   ========================================================================== */
+
+/* Default step colors (red) - Melody mode */
+.step.active {
+    background: #e02;
+}
+
+.subdivision-step.active {
+    background: #e02;
+}
+
+.subdivision .subdivision .subdivision-step.active {
+    background: #c01;
+}
+
+.track-row.minimized .step.active {
+    background: #e02;
+}
+
+.track-row.minimized .subdivision-step.active {
+    background: #e02;
+}
+
+/* Rhythm tab active - Blue steps */
+body.rhythm-mode .step.active {
+    background: #2a2a5d;
+}
+
+body.rhythm-mode .subdivision-step.active {
+    background: #2a2a5d;
+}
+
+body.rhythm-mode .subdivision .subdivision .subdivision-step.active {
+    background: #1a1a4d;
+}
+
+body.rhythm-mode .track-row.minimized .step.active {
+    background: #2a2a5d;
+}
+
+body.rhythm-mode .track-row.minimized .subdivision-step.active {
+    background: #2a2a5d;
+}
+
+/* Section tab active - Green steps */
+body.section-mode .step.active {
+    background: #2a5d2a;
+}
+
+body.section-mode .subdivision-step.active {
+    background: #2a5d2a;
+}
+
+body.section-mode .subdivision .subdivision .subdivision-step.active {
+    background: #1a4d1a;
+}
+
+body.section-mode .track-row.minimized .step.active {
+    background: #2a5d2a;
+}
+
+body.section-mode .track-row.minimized .subdivision-step.active {
+    background: #2a5d2a;
+}
+
+/* ==========================================================================
+   PITCH VISUALIZATION (MELODY MODE)
+   ========================================================================== */
+
+.step.has-pitch {
+    position: relative;
+    overflow: hidden;
+    background: #456;
+}
+
+.step.has-pitch::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: #e02;
+    height: calc(var(--pitch-height, 100%) - 4px);
+    max-height: calc(100% - 4px);
+    transition: height 0.1s ease;
+    pointer-events: none;
+    z-index: 1;
+    min-height: 3px;
+}
+
+/* Larger inset for selected steps with thicker borders */
+.step.selected.has-pitch::after {
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    height: calc(var(--pitch-height, 100%) - 6px);
+    max-height: calc(100% - 6px);
+}
+
+.subdivision-step.has-pitch {
+    position: relative;
+    overflow: hidden;
+    background: #345;
+}
+
+.subdivision-step.has-pitch::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: #e02;
+    height: calc(var(--pitch-height, 100%) - 4px);
+    max-height: calc(100% - 4px);
+    transition: height 0.1s ease;
+    pointer-events: none;
+    z-index: 1;
+    min-height: 3px;
+}
+
+/* Larger inset for selected subdivision steps */
+.subdivision-step.selected.has-pitch::after {
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    height: calc(var(--pitch-height, 100%) - 6px);
+    max-height: calc(100% - 6px);
+}
+
+.step.has-pitch.active {
+    background: #456;
+}
+
+.subdivision-step.has-pitch.active {
+    background: #345;
+}
+
+/* Hide pitch visualization for minimized tracks */
+.track-row.minimized .step.has-pitch::after,
+.track-row.minimized .subdivision-step.has-pitch::after {
+    display: none;
+}
+
+.track-row.minimized .step.has-pitch,
+.track-row.minimized .subdivision-step.has-pitch {
+    background: #456;
+}
+
+.track-row.minimized .subdivision-step.has-pitch {
+    background: #345;
+}
+
+/* ==========================================================================
+   VELOCITY VISUALIZATION (RHYTHM MODE)
+   ========================================================================== */
+
+.step.has-velocity {
+    position: relative;
+    overflow: hidden;
+    background: #456;
+}
+
+.step.has-velocity::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: #05f;
+    height: calc(var(--velocity-height, 100%) - 4px);
+    max-height: calc(100% - 4px);
+    transition: height 0.1s ease;
+    pointer-events: none;
+    z-index: 1;
+    min-height: 3px;
+}
+
+/* Larger inset for selected steps with thicker borders */
+.step.selected.has-velocity::after {
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    height: calc(var(--velocity-height, 100%) - 6px);
+    max-height: calc(100% - 6px);
+}
+
+.subdivision-step.has-velocity {
+    position: relative;
+    overflow: hidden;
+    background: #345;
+}
+
+.subdivision-step.has-velocity::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: #05f;
+    height: calc(var(--velocity-height, 100%) - 4px);
+    max-height: calc(100% - 4px);
+    transition: height 0.1s ease;
+    pointer-events: none;
+    z-index: 1;
+    min-height: 3px;
+}
+
+/* Larger inset for selected subdivision steps */
+.subdivision-step.selected.has-velocity::after {
+    bottom: 3px;
+    left: 3px;
+    right: 3px;
+    height: calc(var(--velocity-height, 100%) - 6px);
+    max-height: calc(100% - 6px);
+}
+
+.step.has-velocity.active {
+    background: #456;
+}
+
+.subdivision-step.has-velocity.active {
+    background: #345;
+}
+
+/* Velocity background for minimized tracks */
+.step.has-velocity-bg {
+    background: #05f !important;
+}
+
+.subdivision-step.has-velocity-bg {
+    background: #05f !important;
+}
+
+.step.has-velocity-bg.active {
+    background: #05f !important;
+}
+
+.subdivision-step.has-velocity-bg.active {
+    background: #05f !important;
+}
+
+/* Hide velocity fill visualization for minimized tracks */
+.track-row.minimized .step.has-velocity::after,
+.track-row.minimized .subdivision-step.has-velocity::after {
+    display: none;
+}
+
+.track-row.minimized .step.has-velocity,
+.track-row.minimized .subdivision-step.has-velocity {
+    background: #456;
+}
+
+.track-row.minimized .subdivision-step.has-velocity {
+    background: #345;
+}
+
+/* ==========================================================================
+   STEP PROPERTIES INDICATORS
+   ========================================================================== */
+
+.step.has-props::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background: #0af;
+    border-radius: 50%;
+    z-index: 12;
+}
+
+.step.has-velocity.has-props::before,
+.step.has-velocity-bg.has-props::before,
+.step.has-pitch.has-props::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background: #0af;
+    border-radius: 50%;
+    z-index: 12;
+}
+
+.subdivision-step.has-props::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 4px;
+    height: 4px;
+    background: #0af;
+    border-radius: 50%;
+    z-index: 12;
+}
+
+.subdivision-step.has-velocity.has-props::before,
+.subdivision-step.has-velocity-bg.has-props::before,
+.subdivision-step.has-pitch.has-props::before {
+    content: '';
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 4px;
+    height: 4px;
+    background: #0af;
+    border-radius: 50%;
+    z-index: 12;
+}
+
+/* ==========================================================================
+   CURSOR STYLES
+   ========================================================================== */
+
+body.melody-mode .step.has-pitch,
+body.melody-mode .subdivision-step.has-pitch,
+body.melody-mode .step.selected,
+body.melody-mode .subdivision-step.selected {
+    cursor: ns-resize;
+}
+
+body .step.has-velocity,
+body .step.has-velocity-bg,
+body .subdivision-step.has-velocity,
+body .subdivision-step.has-velocity-bg,
+body .step.selected,
+body .subdivision-step.selected {
+    cursor: ns-resize;
+}
+
+/* Visual feedback for editing */
+body.melody-mode .step.selected:hover,
+body.melody-mode .subdivision-step.selected:hover,
+body .step.selected:hover,
+body .subdivision-step.selected:hover {
+    box-shadow: inset 0 0 0 1px rgba(0, 170, 255, 0.5);
+}
+
+/* ==========================================================================
+   MODALS
+   ========================================================================== */
+
+/* JSON Modal */
+#json-modal,
+#import-modal,
+#midi-modal,
+#help-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+}
+
+#json-modal.show,
+#import-modal.show,
+#midi-modal.show,
+#help-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#json-content,
+#import-content,
+#midi-content,
+#help-content {
+    background: #234;
+    border: 2px solid #567;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#json-content,
+#import-content {
+    width: 90%;
+    height: 90%;
+}
+
+#midi-content {
+    width: 500px;
+    max-height: 600px;
+}
+
+#help-content {
+    width: 90%;
+    max-width: 800px;
+    height: 90%;
+    max-height: 700px;
+}
+
+#json-header,
+#import-header,
+#midi-header,
+#help-header {
+    background: #345;
+    padding: 15px 20px;
+    border-bottom: 1px solid #567;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px 6px 0 0;
+}
+
+#json-title,
+#import-title,
+#midi-title,
+#help-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    margin: 0;
+}
+
+#json-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#json-copy {
+    background: #567;
+    border: 1px solid #789;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
 }

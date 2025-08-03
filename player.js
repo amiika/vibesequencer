@@ -17,6 +17,7 @@ class AudioWorkletPlayer {
         this.muted = false;
         this.noteOffs = [];
         this.startTime = 0;
+        this.currentLoop = 0;
         this.currentStep = 0;
         this.maxSteps = 0;
         this.sectionStartTime = 0; // Track when current section started
@@ -166,6 +167,7 @@ class AudioWorkletPlayer {
                 flatSteps,
                 index: correctStepIndex,
                 hasFired: hasFired,
+                count: 0
             };
         });
 
@@ -178,6 +180,7 @@ class AudioWorkletPlayer {
         if (this.startTime === 0) {
             this.startTime = now;
             this.sectionStartTime = now;
+            this.currentLoop = 0;
             this.playingSectionIndex = 0; // this.currentSectionIndex;
             this.updateTrackStates();
             this.updatePlayhead(this.currentStep);
@@ -214,7 +217,7 @@ class AudioWorkletPlayer {
             // After section changes, recalculate pattern position for the new/continuing section
             sectionElapsedTime = now - this.sectionStartTime;
             patternPosition = sectionElapsedTime % this.bar;
-
+            this.currentLoop++;
         }
 
         const currentIndex = Math.floor(patternPosition / (this.bar / this.maxSteps));
@@ -241,7 +244,26 @@ class AudioWorkletPlayer {
                 const step = currentStep;
                 const defaults = track.defaults;
 
-                if (step && step.fire && !track.playback?.muted) {
+                let lucky = true;
+                if((track.defaults && track.defaults.odds) || step.odds) {
+                    const randomValue = Math.random();
+                    const odds = step.odds || track.defaults.odds || 1.0;
+                    console.log(odds, randomValue);
+                    if( randomValue > odds) {
+                        lucky = false;
+                    }
+                }
+
+                let modded = true;
+                if((track.defaults && track.defaults.mod) || step.mod) {
+                    const mod = step.mod || track.defaults.mod || 1;
+                    if( this.currentLoop % mod !== 0) {
+                        modded = false;
+                    }
+                }
+
+                if (step && step.fire && !track.playback?.muted && lucky && modded) {
+                     
                     const note = step.note ?? defaults.note;
                     const velocity = step.velocity ?? defaults.velocity ?? 100;
                     const channel = (step.channel ?? defaults.channel) - 1;

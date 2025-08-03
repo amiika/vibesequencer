@@ -182,9 +182,9 @@
             </div>
             <div id="import-display">
                 <div id="import-instructions">
-                    <p>Paste your JSON data below and click "Import" to load it:</p>
+                    <p>Paste your ASCII or JSON data below and click "Import" to load it:</p>
                 </div>
-                <textarea id="import-textarea" placeholder="Paste JSON data here..."></textarea>
+                <textarea id="import-textarea" placeholder="Paste ASCII (BD: x - x - - x) etc. or exported JSON data here... "></textarea>
                 <div id="import-controls">
                     <button id="import-execute">Import</button>
                     <button id="import-clear">Clear</button>
@@ -435,6 +435,7 @@
     <script src="init-steps.js"></script>
     <script src="sequencer.js"></script>
     <script src="player.js"></script>
+    <script src="asciiparser.js"></script>
     <script>
 
         // DEV MODE HAX: Reload the CSS

@@ -7,6 +7,7 @@ class DataSequencer {
         this.currentSectionIndex = 0;
         this.currentSection = this.data[this.currentSectionIndex];
         this.isFollowingPlayback = false;
+        this.asciiParser = new ASCIINotationParser();
         this.selection = {
             type: 'none',
             trackIndex: -1,
@@ -587,7 +588,7 @@ class DataSequencer {
 
         $('import-button').addEventListener('click', () => this.showImportModal());
         $('import-close').addEventListener('click', () => this.hideImportModal());
-        $('import-execute').addEventListener('click', () => this.importJsonData());
+        $('import-execute').addEventListener('click', () => this.importData());
         $('import-clear').addEventListener('click', () => this.clearImportData());
 
         // MIDI modal event listeners
@@ -4563,7 +4564,7 @@ class DataSequencer {
     render(from="default") {
         // For debugging:
         // console.log("Render:", from);
-        
+
         this.calculateMaxSteps();
 
         // Update melody mode class based on current tab
@@ -5028,32 +5029,45 @@ createTrackSteps(track, trackIndex) {
         $('import-modal').classList.remove('show');
     }
 
-    // Import JSON data
-    importJsonData() {
+    // Import JSON data or ASCII notation
+   importData() {
         const textarea = $('import-textarea');
         const statusDiv = $('import-status');
-        const jsonText = textarea.value.trim();
+        const inputText = textarea.value.trim();
 
-        if (!jsonText) {
-            statusDiv.textContent = 'Please paste JSON data first.';
+        if (!inputText) {
+            statusDiv.textContent = 'Please paste JSON data or ASCII notation first.';
             statusDiv.style.color = '#f66';
             return;
         }
 
+        let newSection = false;
+
         try {
-            // Parse the JSON
-            const importedData = JSON.parse(jsonText);
+            let importedData;
 
-            // Validate the structure
-            if (!importedData.sections || !Array.isArray(importedData.sections)) {
-                throw new Error('Invalid format: missing sections array');
-            }
+            // Try to detect if this is ASCII notation or JSON
+            if (this.isASCIINotation(inputText)) {
+                newSection = true;
+                // Parse as ASCII notation
+                importedData = this.asciiParser.parseASCII(inputText);
+                statusDiv.textContent = 'Detected ASCII notation format...';
+                statusDiv.style.color = '#fa8';
+            } else {
+                // Parse as JSON
+                importedData = JSON.parse(inputText);
 
-            // Validate each section has required properties
-            for (let i = 0; i < importedData.sections.length; i++) {
-                const section = importedData.sections[i];
-                if (!section.name || !section.tracks || !Array.isArray(section.tracks)) {
-                    throw new Error(`Invalid section ${i}: missing name or tracks`);
+                // Validate the structure
+                if (!importedData.sections || !Array.isArray(importedData.sections)) {
+                    throw new Error('Invalid format: missing sections array');
+                }
+
+                // Validate each section has required properties
+                for (let i = 0; i < importedData.sections.length; i++) {
+                    const section = importedData.sections[i];
+                    if (!section.name || !section.tracks || !Array.isArray(section.tracks)) {
+                        throw new Error(`Invalid section ${i}: missing name or tracks`);
+                    }
                 }
             }
 
@@ -5064,16 +5078,24 @@ createTrackSteps(track, trackIndex) {
                 $('follow-button').style.display = 'none';
             }
 
-            // Update the data
-            this.data = importedData.sections;
-            this.player.sections = importedData.sections;
+            if(newSection) {
+                this.currentSectionIndex = this.data.length - 1;
+                this.data.push(importedData.sections[0]);
+            } else {
+                // Update the data
+                this.data = importedData.sections;
+                this.player.sections = importedData.sections;
 
-            // Reset to first section
-            this.currentSectionIndex = 0;
-            this.currentSection = this.data[0];
-            this.player.currentSectionIndex = 0;
-            this.player.currentSection = this.data[0];
-            this.player.playingSectionIndex = 0;
+                // Reset to first section
+                this.currentSectionIndex = 0;
+                this.currentSection = this.data[0];
+                this.player.currentSectionIndex = 0;
+                this.player.currentSection = this.data[0];
+                this.player.playingSectionIndex = 0;
+            }
+
+
+            
 
             // Clear selection and reset following
             this.clearSelection();
@@ -5091,7 +5113,8 @@ createTrackSteps(track, trackIndex) {
             }
 
             // Show success message
-            statusDiv.textContent = `Successfully imported ${importedData.sections.length} sections!`;
+            const trackCount = importedData.sections.reduce((count, section) => count + section.tracks.length, 0);
+            statusDiv.textContent = `Successfully imported ${importedData.sections.length} sections with ${trackCount} tracks!`;
             statusDiv.style.color = '#8f8';
 
             // Close modal after short delay
@@ -5105,6 +5128,23 @@ createTrackSteps(track, trackIndex) {
             statusDiv.style.color = '#f66';
             console.error('Import error:', error);
         }
+    }
+
+    // Check if text looks like ASCII notation
+    isASCIINotation(text) {
+        // Look for pattern: WORD: followed by x, -, numbers, or similar characters
+        const asciiPattern = /^[A-Z0-9_]{1,10}\s*:\s*[x\-\._oOX0-9\s]+$/m;
+        return asciiPattern.test(text);
+    }
+
+    // Export current section to ASCII notation
+    exportToASCII(options = {}) {
+        return this.asciiParser.exportToASCII({
+            sections: [this.currentSection]
+        }, {
+            sectionIndex: 0,
+            ...options
+        });
     }
 
     // Clear import textarea

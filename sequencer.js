@@ -30,7 +30,8 @@ class DataSequencer {
             // Follow the playback to the new section
             this.switchToSection(newSectionIndex);
         } else {
-            this.render(); // This updates section tab visual indicators
+            // this.render("onPlaybackSectionChange");
+            // TODO: Use query selector?
         }
     }
 
@@ -56,7 +57,7 @@ class DataSequencer {
         // Set initial context mode class
         this.updateContextModeBodyClass();
 
-        this.render();
+        this.render("init");
         this.updateContextMenu();
     }
 
@@ -75,7 +76,7 @@ class DataSequencer {
         // Section name input
         $('section-name-input').addEventListener('input', (e) => {
             this.currentSection.name = e.target.value;
-            this.render(); // Re-render to update section tab name
+            this.render("setupSectionEventListeners"); // Re-render to update section tab name
         });
 
         // Section repeat input
@@ -178,7 +179,7 @@ class DataSequencer {
         // Clear selection and update
         this.clearSelection();
         this.player.updateTrackStates();
-        this.render();
+        this.render("clearCurrentSection");
         this.updateContextMenu();
 
         console.log(`Cleared section "${this.currentSection.name}" - removed all tracks, left one empty track`);
@@ -212,7 +213,7 @@ class DataSequencer {
 
         // Update player and UI
         this.player.updateTrackStates();
-        this.render();
+        this.render("clearAllSections");
         this.updateContextMenu();
 
     }
@@ -248,7 +249,7 @@ class DataSequencer {
         this.cloneTrack(trackIndex);
 
         // Re-render and update context menu
-        this.render();
+        this.render("cloneSelectedTrack");
         this.updateContextMenu();
     }
 
@@ -271,37 +272,10 @@ class DataSequencer {
         this.clearSelection();
 
         // Re-render everything
-        this.render();
+        this.render("switchToSection");
         this.updateContextMenu();
 
     }
-
-
-
-    handleAutomaticSectionAdvance(newPlayingSectionIndex) {
-        if (this.isFollowingPlayback) {
-            // Follow the playback to the new section
-            this.currentSectionIndex = newPlayingSectionIndex;
-            this.currentSection = this.data[newPlayingSectionIndex];
-
-            // Update player's current section to match
-            this.player.currentSectionIndex = newPlayingSectionIndex;
-            this.player.currentSection = this.data[newPlayingSectionIndex];
-
-            // Clear selection and re-render
-            this.clearSelection();
-            this.render();
-            this.updateContextMenu(); // Only update context menu when following
-
-        } else {
-            // Not following - just update the visual indicators without changing UI section
-            this.render(); // This will update the playing indicators on tabs
-            // DO NOT update context menu - keep it focused on the section being edited
-
-        }
-    }
-
-
 
     showSectionControls() {
         const sectionControls = document.getElementById('section-controls');
@@ -542,7 +516,7 @@ class DataSequencer {
             } else if (e.key === 'Escape') {
                 e.preventDefault();
                 this.clearSelection();
-                this.render();
+                this.render("setupEventListeners: Escape");
                 this.updateContextMenu();
             } else if (this.isNumberKey(e.key)) {
                 e.preventDefault();
@@ -573,7 +547,7 @@ class DataSequencer {
                 this.updateContextModeBodyClass();
 
                 // Re-render to update step colors and pitch visualizations
-                this.render();
+                this.render("setupEventListeners: context tab click");
             });
         });
 
@@ -844,7 +818,7 @@ class DataSequencer {
         if (!action || (!action.type)) {
             if (hadSelection) {
                 this.clearSelection();
-                this.render();
+                this.render("handleClick: selection, no action");
                 this.updateContextMenu();
             }
             return;
@@ -900,7 +874,7 @@ class DataSequencer {
             this.clearSelection();
         }
 
-        this.render();
+        this.render("handleClick");
         this.updateContextMenu();
     }
 
@@ -937,7 +911,7 @@ class DataSequencer {
         } else {
             if (hadSelection) {
                 this.clearSelection();
-                this.render();
+                this.render("handleGlobalClick: outside sequencer");
                 this.updateContextMenu();
             }
         }
@@ -1266,7 +1240,7 @@ class DataSequencer {
 
         this.updateContextMenuInputsFromSelection();
         this.player.updateTrackStates();
-        this.render();
+        this.render("changeVelocitySelection");
         this.updateContextMenu();
 
     }
@@ -1436,7 +1410,7 @@ class DataSequencer {
 
         this.updateContextMenuInputsFromSelection();
         this.player.updateTrackStates();
-        this.render();
+        this.render("changePitchSelectionIndividually");
         this.updateContextMenu();
 
     }
@@ -1589,7 +1563,7 @@ class DataSequencer {
 
         this.clearSelection();
         this.player.updateTrackStates();
-        this.render();
+        this.render("createQuickSubdivision");
         this.updateContextMenu();
     }
 
@@ -1677,7 +1651,7 @@ class DataSequencer {
 
         // Update the visual display
         this.player.updateTrackStates();
-        this.render();
+        this.render("setPitchNumber");
         this.updateContextMenu();
 
     }
@@ -2007,7 +1981,7 @@ class DataSequencer {
 
         if (!action) {
             this.clearSelection();
-            this.render();
+            this.render("handleRightClick: select");
             this.updateContextMenu();
             return;
         }
@@ -2016,7 +1990,7 @@ class DataSequencer {
         if (this.isClickingOnCurrentSelection(action)) {
             // Right-clicking on current selection - clear it
             this.clearSelection();
-            this.render();
+            this.render("handleRightClick: clear");
             this.updateContextMenu();
             return;
         }
@@ -2048,7 +2022,7 @@ class DataSequencer {
             this.selectTrack(action.track);
         }
 
-        this.render();
+        this.render("handleRightClick: action");
         this.updateContextMenu();
     }
 
@@ -2156,7 +2130,7 @@ class DataSequencer {
         }
 
         this.player.updateTrackStates();
-        this.render();
+        this.render("generateEuclideanPattern");
         this.updateContextMenu();
     }
 
@@ -2225,7 +2199,7 @@ class DataSequencer {
         }
 
         this.player.updateTrackStates();
-        this.render();
+        this.render("handleLengthChange");
         this.updateContextMenu();
     }
 
@@ -2243,26 +2217,19 @@ class DataSequencer {
     }
 
     handleTrackControlFocus(e) {
-        console.log('handleTrackControlFocus called for:', e.target.classList.toString());
-
-        // Select track when length, pulses, or rotate inputs are focused
+        // Select track when length, pulses, rotate are focused
         if (e.target.classList.contains('track-length-input') ||
             e.target.classList.contains('track-euclidean-pulses-input') ||
             e.target.classList.contains('track-rotate-input')) {
 
-            console.log('Input type detected:', e.target.classList.toString());
             const trackIndex = parseInt(e.target.dataset.track);
-            console.log('Track index:', trackIndex);
 
             // Only change selection if not already selected
             if (this.selection.type !== 'track' || this.selection.trackIndex !== trackIndex) {
-                console.log('Selecting track:', trackIndex);
                 this.clearSelection();
                 this.selectTrack(trackIndex);
-                this.render();
+                this.render("handleTrackControlFocus: clear selection");
                 this.updateContextMenu();
-            } else {
-                console.log('Track already selected');
             }
         }
 
@@ -2272,10 +2239,7 @@ class DataSequencer {
             e.target.classList.contains('track-rotate-input')) {
 
             const handleBlur = (blurEvent) => {
-                console.log('Blur event for:', blurEvent.target.classList.toString());
-
                 if (blurEvent.target.classList.contains('track-length-input')) {
-                    console.log('Processing length blur');
                     const trackIndex = parseInt(blurEvent.target.dataset.track);
                     const newLength = parseInt(blurEvent.target.value) || 1;
                     const clampedLength = Math.max(1, Math.min(32, newLength));
@@ -2287,7 +2251,6 @@ class DataSequencer {
                     this.adjustTrackLength(trackIndex, clampedLength);
                     this.handleLengthChange(trackIndex, clampedLength);
                 } else if (blurEvent.target.classList.contains('track-euclidean-pulses-input')) {
-                    console.log('Processing pulses blur');
                     const trackIndex = parseInt(blurEvent.target.dataset.track);
                     const pulses = parseInt(blurEvent.target.value) || 0;
                     const track = this.currentSection.tracks[trackIndex];
@@ -2306,7 +2269,6 @@ class DataSequencer {
                     this.generateEuclideanPattern(trackIndex, steps, limitedPulses);
                 } else if (blurEvent.target.classList.contains('track-rotate-input')) {
                     const trackIndex = parseInt(blurEvent.target.dataset.track);
-                    console.log('Processing rotate blur');
                     const rotateValue = parseInt(blurEvent.target.value) || 1;
                     const clampedRotateValue = Math.max(1, Math.min(32, rotateValue));
 
@@ -2314,11 +2276,9 @@ class DataSequencer {
                         blurEvent.target.value = clampedRotateValue;
                     }
 
-                    // Save rotate value to track defaults
                     const track = this.currentSection.tracks[trackIndex];
                     if (!track.defaults) track.defaults = {};
                     track.defaults.rotate = clampedRotateValue;
-
                 }
 
                 // Remove the blur listener after use
@@ -2350,18 +2310,14 @@ class DataSequencer {
 
         this.currentSection.tracks.push(newTrack);
         this.player.updateTrackStates();
-        this.render();
+        this.render("addNewTrack");
     }
-
     handleTrackControlInput(e) {
         const trackIndex = parseInt(e.target.dataset.track);
 
         if (e.target.classList.contains('track-name-input') ||
             e.target.classList.contains('track-name-input-small')) {
-            // Update track name
             this.currentSection.tracks[trackIndex].name = e.target.value;
-
-            // Update section display if this track is selected
             if (this.selection.type === 'track' && this.selection.trackIndex === trackIndex) {
                 this.updateSectionDisplay();
             }
@@ -2510,7 +2466,7 @@ class DataSequencer {
         this.selectTrack(trackIndex);
 
         // Re-render to show track selection
-        this.render();
+        this.render("handleTrackNRotate: select track");
         this.updateContextMenu();
 
         // Apply n-step rotation using refactored applyRotate method
@@ -2558,7 +2514,7 @@ class DataSequencer {
         }
 
         this.currentSection.tracks.splice(trackIndex, 1);
-        this.render();
+        this.render("removeTrack");
         this.updateContextMenu();
     }
 
@@ -2735,7 +2691,7 @@ class DataSequencer {
             this.extendMultipleSubdivisionSteps(direction);
         }
 
-        this.render();
+        this.render("extendSelectionIfExists");
         this.updateContextMenu();
     }
 
@@ -3242,7 +3198,7 @@ class DataSequencer {
 
         // Update the visual display
         this.player.updateTrackStates();
-        this.render();
+        this.render("applyVelocity");
         this.updateContextMenu();
     }
 
@@ -3698,7 +3654,7 @@ class DataSequencer {
 
         // Update the visual display
         this.player.updateTrackStates();
-        this.render();
+        this.render("applyPitch");
     }
 
     applyOctave() {
@@ -3727,7 +3683,7 @@ class DataSequencer {
 
         // Update the visual display
         this.player.updateTrackStates();
-        this.render();
+        this.render("applyOctave");
     }
 
     applyScale() {
@@ -3821,7 +3777,7 @@ class DataSequencer {
         if (this.selectionChanged) {
             this.player.updateTrackStates();
         }
-        this.render();
+        this.render("applyToSelection");
     }
     applyInverse() {
         if (this.selection.type === 'none') return;
@@ -3848,7 +3804,7 @@ class DataSequencer {
         }
 
         this.player.updateTrackStates();
-        this.render();
+        this.render("applyInverse");
     }
 
     applyRotate(direction, rotateAmount = 1) {
@@ -3871,7 +3827,7 @@ class DataSequencer {
 
         if (this.selectionChanged) {
             this.player.updateTrackStates();
-            this.render();
+            this.render("applyRotate");
         }
     }
 
@@ -4020,7 +3976,7 @@ class DataSequencer {
         if (newSelection) {
             this.clearSelection();
             this.selection = newSelection;
-            this.render();
+            this.render("moveSelection");
             this.updateContextMenu();
         } else {
             // If we can't move to a new position, check for track header transitions
@@ -4028,7 +3984,7 @@ class DataSequencer {
                 // Moving left from first step - go to track header
                 this.clearSelection();
                 this.selectTrack(currentTrackIndex);
-                this.render();
+                this.render("moveSelection: To header");
                 this.updateContextMenu();
             } else if (direction > 0) {
                 // Moving right from last step - go to track header
@@ -4036,7 +3992,7 @@ class DataSequencer {
                 if (currentPosition === trackLength - 1) {
                     this.clearSelection();
                     this.selectTrack(currentTrackIndex);
-                    this.render();
+                    this.render("moveSelection: To header");
                     this.updateContextMenu();
                 }
             }
@@ -4081,7 +4037,7 @@ class DataSequencer {
 
         // Update selection with new indices
         this.selection.stepIndices = new Set(newIndices);
-        this.render();
+        this.render("moveMultiStepSelection");
         this.updateContextMenu();
     }
 
@@ -4123,58 +4079,6 @@ class DataSequencer {
         }
     }
 
-    moveSelection(direction) {
-        if (this.selection.type === 'none') return;
-
-        // Special handling for track selection
-        if (this.selection.type === 'track') {
-            if (direction > 0) {
-                // Moving right from track header - go to first step of the track
-                this.moveToFirstStepOfTrack(this.selection.trackIndex);
-                return;
-            } else {
-                // Moving left from track header - go to last step of the track
-                this.moveToLastStepOfTrack(this.selection.trackIndex);
-                return;
-            }
-        }
-
-        // Store the current track index before we start moving
-        const currentTrackIndex = this.selection.trackIndex;
-
-        // Get the current flat position and move to the next/previous position
-        const currentPosition = this.getCurrentFlatPosition();
-        if (currentPosition === null) return;
-
-        const newPosition = currentPosition + direction;
-        const newSelection = this.getFlatPositionSelection(currentTrackIndex, newPosition);
-
-        if (newSelection) {
-            this.clearSelection();
-            this.selection = newSelection;
-            this.render();
-            this.updateContextMenu();
-        } else {
-            // If we can't move to a new position, check for track header transitions
-            if (direction < 0 && currentPosition === 0) {
-                // Moving left from first step - go to track header
-                this.clearSelection();
-                this.selectTrack(currentTrackIndex);
-                this.render();
-                this.updateContextMenu();
-            } else if (direction > 0) {
-                // Moving right from last step - go to track header
-                const trackLength = this.getTotalTrackStepCount(currentTrackIndex);
-                if (currentPosition === trackLength - 1) {
-                    this.clearSelection();
-                    this.selectTrack(currentTrackIndex);
-                    this.render();
-                    this.updateContextMenu();
-                }
-            }
-        }
-    }
-
     getTotalTrackStepCount(trackIndex) {
         const track = this.currentSection.tracks[trackIndex];
         return this.getFlatStepCount(track.pattern);
@@ -4190,7 +4094,7 @@ class DataSequencer {
         if (lastStepSelection) {
             this.clearSelection();
             this.selection = lastStepSelection;
-            this.render();
+            this.render("moveToLastStepOfTrack");
             this.updateContextMenu();
         }
     }
@@ -4208,7 +4112,7 @@ class DataSequencer {
 
         this.clearSelection();
         this.selectTrack(newTrackIndex);
-        this.render();
+        this.render("moveSelectionVertical");
         this.updateContextMenu();
     }
 
@@ -4237,7 +4141,7 @@ class DataSequencer {
             };
         }
 
-        this.render();
+        this.render("moveToFirstStepOfTrack");
         this.updateContextMenu();
     }
 
@@ -4459,7 +4363,7 @@ class DataSequencer {
         if (this.selectionChanged) {
             this.clearSelection();
             this.player.updateTrackStates();
-            this.render();
+            this.render("clearStepProperties");
             this.updateContextMenu();
         }
     }
@@ -4535,7 +4439,7 @@ class DataSequencer {
         this.clearSelection();
         this.selectionChanged = true;
         this.player.updateTrackStates();
-        this.render();
+        this.render("breakSubdivision");
     }
 
     breakMainSubdivision(trackIndex, stepIndex) {
@@ -4600,7 +4504,7 @@ class DataSequencer {
 
         this.hideSubdivisionControls();
         this.clearSelection();
-        this.render();
+        this.render("createSubdivision");
     }
 
     createRegularSubdivision(subdivisionCount) {
@@ -4656,7 +4560,10 @@ class DataSequencer {
         }
     }
 
-    render() {
+    render(from="default") {
+        // For debugging:
+        // console.log("Render:", from);
+        
         this.calculateMaxSteps();
 
         // Update melody mode class based on current tab
@@ -4848,7 +4755,8 @@ class DataSequencer {
     `;
         }
     }
-    createTrackSteps(track, trackIndex) {
+
+createTrackSteps(track, trackIndex) {
         // Show different velocity modes based on track state
         const isMinimized = track.layout?.minimized;
         const showMelodyMode = this.isCurrentTabMelody() && !isMinimized;
@@ -4912,7 +4820,6 @@ class DataSequencer {
 
         return steps;
     }
-
 
     stepHasCustomProps(step, defaults) {
         return (step.velocity && step.velocity !== 100) ||
@@ -5174,7 +5081,7 @@ class DataSequencer {
 
             // Update player track states and UI
             this.player.updateTrackStates();
-            this.render();
+            this.render("importJsonData");
             this.updateContextMenu();
 
             // Update tempo input

@@ -198,6 +198,8 @@ class AudioWorkletPlayer {
             this.sectionRepeatCount++;
 
 
+            console.log("Section repeat count:", this.sectionRepeatCount, "Required repeats:", requiredRepeats);
+
             // Check if we've completed all required repeats
             if (this.sectionRepeatCount > 0 && this.sectionRepeatCount >= requiredRepeats) {
                 // We've completed all required repeats, advance to next section
@@ -212,6 +214,7 @@ class AudioWorkletPlayer {
             // After section changes, recalculate pattern position for the new/continuing section
             sectionElapsedTime = now - this.sectionStartTime;
             patternPosition = sectionElapsedTime % this.bar;
+
         }
 
         const currentIndex = Math.floor(patternPosition / (this.bar / this.maxSteps));
@@ -248,20 +251,17 @@ class AudioWorkletPlayer {
                 }
 
                 state.hasFired = true;
-            } else {
-                // console.log("NO");
-            }
+            } 
 
-            if (patternPosition >= currentStep.endTime) {
+             if (patternPosition >= currentStep.endTime) {
                 state.index++;
-
-                if (state.index >= state.flatSteps.length) {
+                state.hasFired = false;
+                if (state.index >= state.flatSteps.length-1) {
                     state.index = 0;
                 }
-
-                state.hasFired = false;
             }
 
+ 
         });
     }
 

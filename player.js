@@ -22,6 +22,9 @@ class AudioWorkletPlayer {
         this.maxSteps = 0;
         this.sectionStartTime = 0; // Track when current section started
         this.onSectionChange = null; // Callback for when playback section changes
+        // TODO: Add as input
+        this.randomSeed = 6545324874324;
+        this.randomGenerator = new SeededRandom(this.randomSeed);
     }
     async init() {
         this.audioContext = new AudioContext();
@@ -144,7 +147,7 @@ class AudioWorkletPlayer {
 
             // Find the correct step index based on current pattern position
             const correctStepIndex = flatSteps.findIndex(
-                step => currentPatternPosition >= step.startTime - 0.01 && currentPatternPosition < step.endTime
+                step => currentPatternPosition >= step.startTime && currentPatternPosition < step.endTime
             );
 
             // Handle end of pattern - wrap to beginning
@@ -159,7 +162,7 @@ class AudioWorkletPlayer {
             const currentStep = flatSteps[correctStepIndex];
 
             // Check if current position is before the step start time with a small tolerance
-            if (currentStep && currentPatternPosition <= currentStep.startTime + 0.01) {
+            if (currentStep && currentPatternPosition <= currentStep.startTime + 0.05) {
                 hasFired = false;
             }
 
@@ -246,7 +249,7 @@ class AudioWorkletPlayer {
 
                 let lucky = true;
                 if((track.defaults && track.defaults.odds) || step.odds) {
-                    const randomValue = Math.random();
+                    const randomValue = this.randomGenerator.next();
                     const odds = step.odds || track.defaults.odds || 1.0;
                     console.log(odds, randomValue);
                     if( randomValue > odds) {
@@ -264,7 +267,13 @@ class AudioWorkletPlayer {
 
                 if (step && step.fire && !track.playback?.muted && lucky && modded) {
                      
-                    const note = step.note ?? defaults.note;
+                    let note = step.note ?? defaults.note;
+
+                    if(step.vibeMatrix || defaults.vibeMatrix) {
+                        const vibe = step.vibeMatrix ?? defaults.vibeMatrix;
+                        note = vibe.nextNote(step.octave ?? defaults.octave ?? 3, step.scale ?? defaults.scale ?? 4095);
+                    }
+
                     const velocity = step.velocity ?? defaults.velocity ?? 100;
                     const channel = (step.channel ?? defaults.channel) - 1;
 

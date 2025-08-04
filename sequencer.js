@@ -18,6 +18,7 @@ class DataSequencer {
         this.maxSteps = 0;
         this.selectionChanged = false;
 
+
         // Set up callback for when player advances sections
         this.player.setOnSectionChange((newSectionIndex) => {
             this.onPlaybackSectionChange(newSectionIndex);
@@ -395,14 +396,12 @@ class DataSequencer {
         const sectionTabs = this.data.map((section, index) => {
             const isActive = index === this.currentSectionIndex;
             const isPlaying = sectionInfo.isPlaying && index === sectionInfo.playingIndex;
-            const isFollowing = this.isFollowingPlayback && isPlaying;
             const canRemove = this.data.length > 1;
 
             // Determine tab classes
             let tabClasses = 'section-tab';
             if (isActive) tabClasses += ' active';
             if (isPlaying) tabClasses += ' playing';
-            if (isFollowing) tabClasses += ' following';
 
             return `
             <div class="${tabClasses}" data-section="${index}">
@@ -568,6 +567,7 @@ class DataSequencer {
         $('channel-input').addEventListener('input', () => this.applyChannel());
         $('velocity-input').addEventListener('input', () => this.applyVelocity());
         $('mod-input').addEventListener('input', () => this.applyMod());
+        $('step-vibe-input').addEventListener('input', () => this.applyStepVibe());
         $('odds-input').addEventListener('input', () => this.applyOdds());
         $('pitch-input').addEventListener('input', () => this.applyPitch());
         $('octave-input').addEventListener('input', () => this.applyOctave());
@@ -1299,7 +1299,7 @@ class DataSequencer {
 
                 const scale = track.defaults.scale || 4095;
                 const octave = track.defaults.octave || 3;
-                const scaleNotes = this.numberToScale(scale);
+                const scaleNotes = numberToScale(scale);
                 let newOctave = octave;
 
                 if (newPitch >= scaleNotes.length) {
@@ -1312,7 +1312,7 @@ class DataSequencer {
 
                 track.defaults.pitch = newPitch;
                 track.defaults.octave = newOctave;
-                track.defaults.note = this.noteFromPitchOctaveScale(newPitch, newOctave, scale);
+                track.defaults.note = noteFromPitchOctaveScale(newPitch, newOctave, scale);
 
                 // Set preview
                 previewNote = track.defaults.note;
@@ -1445,7 +1445,7 @@ class DataSequencer {
         let newOctave = currentOctave;
 
         // Handle scale wrapping
-        const scaleNotes = this.numberToScale(currentScale);
+        const scaleNotes = numberToScale(currentScale);
 
         if (newPitch >= scaleNotes.length) {
             newPitch = 0;
@@ -1457,7 +1457,7 @@ class DataSequencer {
 
         step.pitch = newPitch;
         step.octave = newOctave;
-        step.note = this.noteFromPitchOctaveScale(newPitch, newOctave, currentScale);
+        step.note = noteFromPitchOctaveScale(newPitch, newOctave, currentScale);
         step.fire = 1; // Activate step when changing pitch
     }
 
@@ -1628,7 +1628,7 @@ class DataSequencer {
         const currentOctave = parseInt($('octave-input').value) || 3;
         const currentScale = parseInt($('scale-input').value) || 4095;
 
-        const note = this.noteFromPitchOctaveScale(pitch, currentOctave, currentScale);
+        const note = noteFromPitchOctaveScale(pitch, currentOctave, currentScale);
 
         // Update the input fields
         $('pitch-input').value = pitch;
@@ -1699,7 +1699,7 @@ class DataSequencer {
         } else if (step.pitch !== undefined) {
             const octave = step.octave || track.defaults.octave || 3;
             const scale = step.scale || track.defaults.scale || 4095;
-            note = this.noteFromPitchOctaveScale(step.pitch, octave, scale);
+            note = noteFromPitchOctaveScale(step.pitch, octave, scale);
         } else {
             // Use track defaults
             if (track.defaults.note !== undefined) {
@@ -1707,7 +1707,7 @@ class DataSequencer {
             } else if (track.defaults.pitch !== undefined) {
                 const octave = track.defaults.octave || 3;
                 const scale = track.defaults.scale || 4095;
-                note = this.noteFromPitchOctaveScale(track.defaults.pitch, octave, scale);
+                note = noteFromPitchOctaveScale(track.defaults.pitch, octave, scale);
             } else {
                 note = 36; // Fallback
             }
@@ -1731,7 +1731,7 @@ class DataSequencer {
         let newPitch = currentPitch + direction;
         let newOctave = currentOctave;
 
-        const scaleNotes = this.numberToScale(currentScale);
+        const scaleNotes = numberToScale(currentScale);
 
         if (newPitch >= scaleNotes.length) {
             newPitch = 0;
@@ -1741,7 +1741,7 @@ class DataSequencer {
             newOctave = Math.max(0, newOctave - 1);
         }
 
-        const note = this.noteFromPitchOctaveScale(newPitch, newOctave, currentScale);
+        const note = noteFromPitchOctaveScale(newPitch, newOctave, currentScale);
 
         $('pitch-input').value = newPitch;
         $('octave-input').value = newOctave;
@@ -1751,20 +1751,13 @@ class DataSequencer {
         this.updateContextMenu();
     }
 
-    // Updated pitch/scale methods (simplified)
-    noteFromPitchOctaveScale(pitch, octave, scale = 4095) {
-        const scaleNotes = this.numberToScale(scale);
-        const pitchInScale = scaleNotes[pitch % scaleNotes.length];
-        return (octave * 12) + pitchInScale;
-    }
-
     updatePitchOctaveFromNote(note, scale = 4095) {
         const pitchInput = $('pitch-input');
         const octaveInput = $('octave-input');
         const scaleInput = $('scale-input');
 
-        const octave = this.octaveFromNote(note);
-        const pitch = this.pitchFromNoteAndScale(note, octave, scale);
+        const octave = octaveFromNote(note);
+        const pitch = pitchFromNoteAndScale(note, octave, scale);
 
         pitchInput.value = pitch;
         octaveInput.value = octave;
@@ -2866,6 +2859,7 @@ class DataSequencer {
         const channelInput = $('channel-input');
         const velocityInput = $('velocity-input');
         const modInput = $('mod-input');
+        const stepVibeInput = $('step-vibe-input');
         const oddsInput = $('odds-input');
         const breakButton = $('break-subdivision-button');
         const subdivideButton = $('subdivide-button');
@@ -2886,6 +2880,8 @@ class DataSequencer {
                 velocityInput.value = track.defaults.velocity || 100;
                 modInput.value = track.defaults.mod || '';
                 oddsInput.value = track.defaults.odds || '';
+                stepVibeInput.value = track.defaults.vibe || '';
+
 
                 // Update pitch/octave/scale controls
                 const trackScale = track.defaults.scale || 4095;
@@ -2909,6 +2905,7 @@ class DataSequencer {
                     velocityInput.value = firstStep.velocity || stepsTrack.defaults.velocity || 100;
                     modInput.value = firstStep.mod || '';
                     oddsInput.value = firstStep.odds || '';
+                    stepVibeInput.value = firstStep.vibe || '';
 
                     // Update pitch/octave/scale controls
                     const stepNote = firstStep.note || stepsTrack.defaults.note;
@@ -2947,6 +2944,7 @@ class DataSequencer {
                     velocityInput.value = subStep.velocity || subTrack.defaults.velocity || 100;
                     modInput.value = subStep.mod || '';
                     oddsInput.value = subStep.odds || '';
+                    stepVibeInput.value = track.defaults.vibe || '';
 
                     // Update pitch/octave/scale controls
                     const subStepNote = subStep.note || subTrack.defaults.note;
@@ -2959,6 +2957,7 @@ class DataSequencer {
                     velocityInput.value = trackDefaults.defaults.velocity || 100;
                     modInput.value = trackDefaults.defaults.mod || '';
                     oddsInput.value = trackDefaults.defaults.odds || '';
+                    stepVibeInput.value = track.defaults.vibe || '';
 
                     // Update pitch/octave/scale controls
                     const defaultScale = trackDefaults.defaults.scale || 4095;
@@ -2982,6 +2981,7 @@ class DataSequencer {
                     velocityInput.value = firstSubStep.velocity || firstSubTrack.defaults.velocity || 100;
                     modInput.value = firstSubStep.mod || '';
                     oddsInput.value = firstSubStep.odds || '';
+                    stepVibeInput.value = track.defaults.vibe || '';
 
                     // Update pitch/octave/scale controls
                     const subStepNote = firstSubStep.note || firstSubTrack.defaults.note;
@@ -2998,6 +2998,7 @@ class DataSequencer {
                 velocityInput.value = 100;
                 modInput.value = '';
                 oddsInput.value = '';
+                stepVibeInput.value = '';
 
                 // Update pitch/octave/scale controls to defaults
                 this.updatePitchOctaveFromNote(36, 4095);
@@ -3279,31 +3280,14 @@ class DataSequencer {
         }
     }
 
-    numberToScale(number = 4095) {
-        if (number < 0 || number > 4095) {
-            console.log("Input number must be odd and between 0 and 4095. Using major (2741) instead.");
-            number = 2741;
+    applyStepVibe() {
+        const vibeValue = $('step-vibe-input').value;
+        if (vibeValue === '') {
+            this.applyToSelection('vibe', undefined);
+        } else {
+            const vibe = parseInt(vibeValue);
+            this.applyToSelection('vibe', vibe);
         }
-        if (number % 2 === 0) {
-            console.log("Even numbers don't create a 'real' scale");
-        }
-        const binaryString = (number >>> 0).toString(2).padStart(12, '0');
-        const bits = binaryString.split('');
-        const scale = bits.reduce(function (acc, bit, i) {
-            if (bit === '1') {
-                acc.unshift(11 - i); // Prepend note index
-            }
-            return acc;
-        }, []);
-        return scale;
-    }
-
-    pitchFromNote(note) {
-        return note % 12;
-    }
-
-    octaveFromNote(note) {
-        return Math.floor(note / 12);
     }
 
 
@@ -3344,20 +3328,20 @@ class DataSequencer {
         } else if (step.note !== undefined) {
             // Calculate pitch from step's explicit note
             octave = step.octave || track.defaults.octave || 3;
-            pitch = this.pitchFromNoteAndScale(step.note, octave, scale);
+            pitch = pitchFromNoteAndScale(step.note, octave, scale);
         } else if (track.defaults.pitch !== undefined) {
             // Use track's default pitch
             pitch = track.defaults.pitch;
         } else if (track.defaults.note !== undefined) {
             // Calculate pitch from track's default note
             octave = track.defaults.octave || 3;
-            pitch = this.pitchFromNoteAndScale(track.defaults.note, octave, scale);
+            pitch = pitchFromNoteAndScale(track.defaults.note, octave, scale);
         } else {
             // No pitch information available
             pitch = 0;
         }
 
-        const pitchClasses = this.numberToScale(scale);
+        const pitchClasses = numberToScale(scale);
         const maxPitch = pitchClasses.length - 1;
 
         if (maxPitch === 0) return 10; // Single note scale
@@ -3371,27 +3355,6 @@ class DataSequencer {
         return heightPercent;
     }
 
-    pitchFromNoteAndScale(note, octave, scale = 4095) {
-        // Get the pitch class (0-11) from the note
-        const pitchClass = note % 12;
-
-        // Get the scale notes
-        const scaleNotes = this.numberToScale(scale);
-
-        // Find the closest scale degree to this pitch class
-        let closestIndex = 0;
-        let minDistance = Math.abs(scaleNotes[0] - pitchClass);
-
-        for (let i = 1; i < scaleNotes.length; i++) {
-            const distance = Math.abs(scaleNotes[i] - pitchClass);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestIndex = i;
-            }
-        }
-
-        return closestIndex;
-    }
     handleMelodyClick(e, action) {
         const stepElement = e.target.closest('.step, .subdivision-step');
         if (!stepElement) return;
@@ -3410,7 +3373,7 @@ class DataSequencer {
 
         // Get scale to determine pitch range
         const scale = clickedStep.scale || track.defaults.scale || 4095;
-        const pitchClasses = this.numberToScale(scale);
+        const pitchClasses = numberToScale(scale);
         const maxPitch = pitchClasses.length - 1;
 
         let targetPitch, targetOctave, targetNote, shouldActivate;
@@ -3433,14 +3396,14 @@ class DataSequencer {
                     currentPitch = clickedStep.pitch;
                 } else if (clickedStep.note !== undefined) {
                     const currentOctave = clickedStep.octave || track.defaults.octave || 3;
-                    currentPitch = this.pitchFromNoteAndScale(clickedStep.note, currentOctave, scale);
+                    currentPitch = pitchFromNoteAndScale(clickedStep.note, currentOctave, scale);
                 } else {
                     // Using track defaults
                     if (track.defaults.pitch !== undefined) {
                         currentPitch = track.defaults.pitch;
                     } else if (track.defaults.note !== undefined) {
                         const defaultOctave = track.defaults.octave || 3;
-                        currentPitch = this.pitchFromNoteAndScale(track.defaults.note, defaultOctave, scale);
+                        currentPitch = pitchFromNoteAndScale(track.defaults.note, defaultOctave, scale);
                     } else {
                         currentPitch = 0;
                     }
@@ -3457,14 +3420,14 @@ class DataSequencer {
                     shouldActivate = true;
                     targetPitch = calculatedPitch;
                     targetOctave = clickedStep.octave || track.defaults.octave || 3;
-                    targetNote = this.noteFromPitchOctaveScale(targetPitch, targetOctave, scale);
+                    targetNote = noteFromPitchOctaveScale(targetPitch, targetOctave, scale);
                 }
             } else {
                 // Step is inactive - activate with new pitch
                 shouldActivate = true;
                 targetPitch = calculatedPitch;
                 targetOctave = clickedStep.octave || track.defaults.octave || 3;
-                targetNote = this.noteFromPitchOctaveScale(targetPitch, targetOctave, scale);
+                targetNote = noteFromPitchOctaveScale(targetPitch, targetOctave, scale);
             }
         }
 
@@ -3633,7 +3596,7 @@ class DataSequencer {
         const pitch = parseInt($('pitch-input').value);
         const octave = parseInt($('octave-input').value) || 3;
         const scale = parseInt($('scale-input').value) || 4095;
-        const note = this.noteFromPitchOctaveScale(pitch, octave, scale);
+        const note = noteFromPitchOctaveScale(pitch, octave, scale);
 
         $('note-input').value = note;
 
@@ -3662,7 +3625,7 @@ class DataSequencer {
         const octave = parseInt($('octave-input').value);
         const pitch = parseInt($('pitch-input').value) || 0;
         const scale = parseInt($('scale-input').value) || 4095;
-        const note = this.noteFromPitchOctaveScale(pitch, octave, scale);
+        const note = noteFromPitchOctaveScale(pitch, octave, scale);
 
         $('note-input').value = note;
 
@@ -3696,7 +3659,7 @@ class DataSequencer {
 
         // If not chromatic, recalculate note
         if (scale !== 4095) {
-            const note = this.noteFromPitchOctaveScale(pitch, octave, scale);
+            const note = noteFromPitchOctaveScale(pitch, octave, scale);
             $('note-input').value = note;
             this.applyNote();
         }
@@ -3713,13 +3676,19 @@ class DataSequencer {
     }
 
     applyToSelection(property, value) {
+        let vibeMatrix = null;
+        if(property === 'vibe') {
+            vibeMatrix = new MarkovMatrix(value);
+            vibeMatrix.setRandomizer(this.player.randomGenerator);
+        }
         switch (this.selection.type) {
             case 'track':
-                if (property === 'note' || property === 'channel' || property === 'mod' || property === 'odds' || property === 'scale') {
+                if (property === 'note' || property === 'channel' || property === 'mod' || property === 'odds' || property === 'scale' || property === 'octave' || property === 'vibe') {
                     if (value === undefined) {
                         delete this.currentSection.tracks[this.selection.trackIndex].defaults[property];
                     } else {
                         this.currentSection.tracks[this.selection.trackIndex].defaults[property] = value;
+                        if(property === 'vibe') this.currentSection.tracks[this.selection.trackIndex].defaults["vibeMatrix"] = vibeMatrix;
                     }
                     this.selectionChanged = true;
                 }
@@ -3733,6 +3702,7 @@ class DataSequencer {
                             delete step[property];
                         } else {
                             step[property] = value;
+                            if(property === 'vibe') step["vibeMatrix"] = vibeMatrix;
                         }
                         this.selectionChanged = true;
                     }
@@ -3746,6 +3716,7 @@ class DataSequencer {
                         delete subStep[property];
                     } else {
                         subStep[property] = value;
+                        if(property === 'vibe') subStep["vibeMatrix"] = vibeMatrix;
                     }
                     this.selectionChanged = true;
                 }
@@ -3765,6 +3736,7 @@ class DataSequencer {
                                     delete subStep[property];
                                 } else {
                                     subStep[property] = value;
+                                    if(property === 'vibe') subStep["vibeMatrix"] = vibeMatrix;
                                 }
                                 this.selectionChanged = true;
                             }
@@ -5071,13 +5043,6 @@ createTrackSteps(track, trackIndex) {
                 }
             }
 
-            // Stop playback if running
-            if (this.player.isPlaying) {
-                this.player.stop();
-                $('play-button').textContent = 'Play';
-                $('follow-button').style.display = 'none';
-            }
-
             if(newSection) {
                 this.currentSectionIndex = this.data.length - 1;
                 this.data.push(importedData.sections[0]);
@@ -5099,7 +5064,6 @@ createTrackSteps(track, trackIndex) {
 
             // Clear selection and reset following
             this.clearSelection();
-            this.isFollowingPlayback = true;
 
             // Update player track states and UI
             this.player.updateTrackStates();

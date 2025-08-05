@@ -3,9 +3,9 @@ class DataSequencer {
     constructor(container, player) {
         this.container = container;
         this.player = player;
-        this.data = player.sections;
+        this.sections = player.sections;
         this.currentSectionIndex = 0;
-        this.currentSection = this.data[this.currentSectionIndex];
+        this.currentSection = this.sections[this.currentSectionIndex];
         this.isFollowingPlayback = false;
         this.asciiParser = new ASCIINotationParser();
         this.selection = {
@@ -15,13 +15,17 @@ class DataSequencer {
             subdivisionPath: null
         };
         this.isShiftPressed = false;
-        this.maxSteps = 0;
+        this.sectionMaxSteps = 0;
         this.selectionChanged = false;
 
+        // Player callbacks to update UI
 
-        // Set up callback for when player advances sections
         this.player.setOnSectionChange((newSectionIndex) => {
             this.onPlaybackSectionChange(newSectionIndex);
+        });
+
+        this.player.setOnStepChange((stepIndex, sectionIndex)=>{
+            this.onPlaybackStepChange(stepIndex, sectionIndex);
         });
 
         this.init();
@@ -33,8 +37,30 @@ class DataSequencer {
             this.switchToSection(newSectionIndex);
         } else {
             // this.render("onPlaybackSectionChange");
-            // TODO: Use query selector?
+            // TODO: Use query selector to update class on section with newSectionIndex
+            document.querySelectorAll('.section-tab').forEach(tab => {
+                if (parseInt(tab.getAttribute('data-section')) === newSectionIndex) {
+                    tab.classList.add('playing');
+                } else {
+                    tab.classList.remove('playing');
+                }
+            });
         }
+    }
+
+    onPlaybackStepChange(stepIndex, sectionIndex) {
+        const isViewingPlayingSection = sectionIndex === this.currentSectionIndex;
+        // Use modulo to wrap the step index around the number of steps in the currently viewed section.
+        // This ensures the playhead is always displayed correctly, even if the playing section has a different length.
+        const currentStep = stepIndex % this.sectionMaxSteps;
+
+        document.querySelectorAll('.index-step').forEach((el, index) => {
+            const isCurrentStepForThisElement = index === currentStep;
+
+            // Use toggle with a boolean for cleaner state management and to fix blinking.
+            el.classList.toggle('current', isViewingPlayingSection && isCurrentStepForThisElement);
+           // el.classList.toggle('offsection', !isViewingPlayingSection && isCurrentStepForThisElement);
+        });
     }
 
     toggleFollowing() {
@@ -143,33 +169,20 @@ class DataSequencer {
         $('confirm-dialog').classList.add('show');
     }
 
-    newEmptyTrack = () => ({
+    newEmptyTrack = (numOfSteps=16) => ({
         name: "Track 1",
         defaults: {
             note: 36,
-            channel: 9,
-            velocity: 100
+            channel: 10,
+            velocity: 100,
+            sustain: ((this.player.bar / numOfSteps) * 0.9).toFixed(2)
         },
         playback: { muted: false },
-        pattern: [
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 },
-            { type: "step", fire: 0 }
-        ],
-        operations: { euclidean: { steps: 16, pulses: 0 }, rotate: 1 },
+        pattern: Array(numOfSteps).fill().map(u => ({
+            type: "step",
+            fire: 0
+        })),
+        operations: { euclidean: { steps: numOfSteps, pulses: 0 }, rotate: 1 },
         layout: { minimized: false, selected: false }
     });
 
@@ -197,21 +210,18 @@ class DataSequencer {
         };
 
         // Replace all sections with just the fresh Section 1
-        this.data = [freshSection];
-        this.player.sections = this.data;
+        this.sections = [freshSection];
+        this.player.sections = this.sections;
 
-        console.log(this.data);
-
-        // Reset to Section 1
+        // Reset to Section 1 ...
         this.currentSectionIndex = 0;
-        this.currentSection = this.data[0];
+        this.currentSection = this.sections[0];
         this.player.currentSectionIndex = 0;
-        this.player.currentSection = this.data[0];
+        this.player.currentSection = this.sections[0];
         this.player.playingSectionIndex = 0;
 
         // Clear selection and reset following
         this.clearSelection();
-        this.isFollowingPlayback = true;
 
         // Update player and UI
         this.player.updateTrackStates();
@@ -256,15 +266,15 @@ class DataSequencer {
     }
 
     switchToSection(sectionIndex) {
-        if (sectionIndex < 0 || sectionIndex >= this.data.length) return;
+        if (sectionIndex < 0 || sectionIndex >= this.sections.length) return;
 
         // Simple section switching - always update UI
         this.currentSectionIndex = sectionIndex;
-        this.currentSection = this.data[sectionIndex];
+        this.currentSection = this.sections[sectionIndex];
 
         // Update player's current section for UI purposes (tempo sync, etc.)
         this.player.currentSectionIndex = sectionIndex;
-        this.player.currentSection = this.data[sectionIndex];
+        this.player.currentSection = this.sections[sectionIndex];
 
         // DO NOT update playingSectionIndex or track states when just browsing sections
         // The playingSectionIndex should only be updated by the audio player itself during playback
@@ -294,39 +304,22 @@ class DataSequencer {
     }
 
     createNewSection() {
-        const newSectionIndex = this.data.length + 1;
+        const track = this.currentSection.tracks[this.selection.trackIndex];
+        const newSectionIndex = this.sections.length + 1;
         const newSection = {
             name: `Section ${newSectionIndex}`,
             bpm: 120,
             repeat: 1,
-            tracks: [
-                {
-                    name: "Track 1",
-                    defaults: {
-                        note: 36,
-                        channel: 9,
-                        velocity: 100
-                    },
-                    playback: { muted: false },
-                    pattern: [
-                        { type: "step", fire: 0 },
-                        { type: "step", fire: 0 },
-                        { type: "step", fire: 0 },
-                        { type: "step", fire: 0 }
-                    ],
-                    operations: { euclidean: { steps: 4, pulses: 1 }, rotate: 0 },
-                    layout: { minimized: false }
-                }
-            ]
+            tracks: [this.newEmptyTrack()]
         };
 
-        this.data.push(newSection);
+        this.sections.push(newSection);
 
         // Update player's sections array
-        this.player.sections = this.data;
+        this.player.sections = this.sections;
 
         // Switch to the new section
-        this.switchToSection(this.data.length - 1);
+        this.switchToSection(this.sections.length - 1);
     }
 
     cloneCurrentSection() {
@@ -337,7 +330,7 @@ class DataSequencer {
         let newIndex = 2;
         let newName = baseName + ' (' + newIndex + ')';
 
-        while (this.data.some(section => section.name === newName)) {
+        while (this.sections.some(section => section.name === newName)) {
             newIndex++;
             newName = baseName + ' (' + newIndex + ')';
         }
@@ -351,23 +344,23 @@ class DataSequencer {
             }
         });
 
-        this.data.push(clonedSection);
+        this.sections.push(clonedSection);
 
         // Update player's sections array
-        this.player.sections = this.data;
+        this.player.sections = this.sections;
 
         // Switch to the new cloned section
-        this.switchToSection(this.data.length - 1);
+        this.switchToSection(this.sections.length - 1);
     }
 
 
     confirmRemoveSection(sectionIndex) {
-        if (this.data.length <= 1) {
+        if (this.sections.length <= 1) {
             alert('Cannot remove the last section');
             return;
         }
 
-        const section = this.data[sectionIndex];
+        const section = this.sections[sectionIndex];
         this.pendingRemoveSectionIndex = sectionIndex;
 
         $('confirm-title').textContent = 'Remove Section';
@@ -375,28 +368,65 @@ class DataSequencer {
         $('confirm-dialog').classList.add('show');
     }
 
-    // Method to actually remove a section
     removeSection(sectionIndex) {
-        if (this.data.length <= 1) return;
-
-        this.data.splice(sectionIndex, 1);
-
-        // Adjust current section index if needed
-        if (this.currentSectionIndex >= sectionIndex) {
-            this.currentSectionIndex = Math.max(0, this.currentSectionIndex - 1);
+        if (this.sections.length <= 1) {
+            // This is checked in confirmRemoveSection, but we keep it as a safeguard.
+            console.warn("Cannot remove the last section.");
+            return;
         }
 
-        // Switch to the adjusted section
-        this.switchToSection(this.currentSectionIndex);
+        // Get player state BEFORE modification
+        const isPlaying = this.player.isPlaying;
+        const playingIndexBeforeRemove = this.player.playingSectionIndex;
+
+        // Determine if the currently playing section is the one being removed.
+        const isRemovingPlayingSection = isPlaying && (playingIndexBeforeRemove === sectionIndex);
+
+        // --- 1. Modify Data ---
+        // Remove the section from the sequencer's data array.
+        this.sections.splice(sectionIndex, 1);
+        this.player.sections = this.sections;
+
+        // --- 2. Adjust Player's Live Playback State ---
+        if (isRemovingPlayingSection) {
+            // The currently playing section was just deleted.
+            // Force the player to jump to the section that took its place.
+            // If the last item was removed, the index wraps around to a valid position.
+            const newPlayingIndex = playingIndexBeforeRemove % this.sections.length;
+            this.player.forceSwitchToSection(newPlayingIndex);
+
+        } else if (isPlaying && sectionIndex < playingIndexBeforeRemove) {
+            // A section BEFORE the currently playing one was removed.
+            // The index of the playing section has shifted down by one.
+            this.player.playingSectionIndex--;
+        }
+        // If playing and a section AFTER the playing one was removed, the player's index remains correct.
+
+        // --- 3. Adjust UI State ---
+        // This logic determines which section the UI should display after the deletion.
+        let newUiIndex = this.currentSectionIndex;
+        if (sectionIndex < this.currentSectionIndex) {
+            // A section before the one we were viewing was removed, so our view needs to shift left.
+            newUiIndex--;
+        } else if (sectionIndex === this.currentSectionIndex) {
+            // The section we were viewing was deleted. View the one that slid into its place.
+            newUiIndex = sectionIndex % this.sections.length;
+        }
+        newUiIndex = Math.max(0, newUiIndex); // Safeguard against negative index.
+
+        // --- 4. Finalize and Re-render ---
+        // This switches the UI view to the correct section. It also updates the player's
+        // non-playing state (`currentSectionIndex`) to keep it synced with the UI.
+        this.switchToSection(newUiIndex);
     }
 
     createSectionTabs() {
         const sectionInfo = this.player.getSectionInfo();
 
-        const sectionTabs = this.data.map((section, index) => {
+        const sectionTabs = this.sections.map((section, index) => {
             const isActive = index === this.currentSectionIndex;
             const isPlaying = sectionInfo.isPlaying && index === sectionInfo.playingIndex;
-            const canRemove = this.data.length > 1;
+            const canRemove = this.sections.length > 1;
 
             // Determine tab classes
             let tabClasses = 'section-tab';
@@ -566,6 +596,7 @@ class DataSequencer {
         $('note-input').addEventListener('input', () => this.applyNote());
         $('channel-input').addEventListener('input', () => this.applyChannel());
         $('velocity-input').addEventListener('input', () => this.applyVelocity());
+        $('sustain-input').addEventListener('input', () => this.applySustain());
         $('mod-input').addEventListener('input', () => this.applyMod());
         $('step-vibe-input').addEventListener('input', () => this.applyStepVibe());
         $('odds-input').addEventListener('input', () => this.applyOdds());
@@ -630,6 +661,36 @@ class DataSequencer {
         // Confirmation dialog listeners
         $('confirm-yes').addEventListener('click', () => this.handleConfirmYes());
         $('confirm-no').addEventListener('click', () => this.hideConfirmDialog());
+    }
+
+    applySustain() {
+        const sustainValue = $('sustain-input').value;
+
+        console.log("SUSTAIN:", sustainValue);
+
+        if (sustainValue === '') {
+            this.applyToSelection('sustain', undefined);
+        } else {
+            const sustain = parseFloat(sustainValue);
+
+            if (sustain >= 0) {
+
+                if (this.selection.type === 'track') {
+                    // For track selection, set defaults AND update existing explicit values
+                    const track = this.currentSection.tracks[this.selection.trackIndex];
+
+                    console.log("WAS:" + track.defaults.sustain);
+                    // 1. Set track defaults
+                    track.defaults.sustain = sustain;
+
+                } else {
+                    // For all other selections, apply to the selected steps
+                    this.applyToSelection('sustain', sustain);
+                }
+
+
+            }
+        }
     }
 
     showMidiModal() {
@@ -919,31 +980,33 @@ class DataSequencer {
     }
 
     updateContextMenuInputsFromSelection() {
+        const subdivisionInfo = this.getSubdivisionInfo();
         let firstStep = null;
-        let track = null;
+        const track = this.currentSection.tracks[this.selection.trackIndex];
 
         switch (this.selection.type) {
             case 'track':
-                track = this.currentSection.tracks[this.selection.trackIndex];
                 $('pitch-input').value = track.defaults.pitch || 0;
                 $('note-input').value = track.defaults.note || 36;
                 $('octave-input').value = track.defaults.octave || 3;
                 $('scale-input').value = track.defaults.scale || 4095;
+                $('sustain-input').value = track.defaults.sustain || ((this.player.bar / track.pattern.length)).toFixed(2);
                 break;
 
             case 'steps':
                 firstStep = this.getFirstSelectedStep();
-                track = this.currentSection.tracks[this.selection.trackIndex];
+
                 if (firstStep) {
                     $('pitch-input').value = firstStep.pitch || 0;
                     $('note-input').value = firstStep.note || track.defaults.note;
                     $('octave-input').value = firstStep.octave || track.defaults.octave || 3;
                     $('scale-input').value = firstStep.scale || track.defaults.scale || 4095;
+                    $('sustain-input').value = firstStep.sustain || track.defaults.sustain || ((this.player.bar / track.pattern.length)).toFixed(2);
                 }
                 break;
 
             case 'subdivision':
-                track = this.currentSection.tracks[this.selection.trackIndex];
+
                 const subdivision = this.navigateToSubdivision(this.selection.trackIndex, this.selection.subdivisionPath);
 
                 if (subdivision) {
@@ -953,6 +1016,8 @@ class DataSequencer {
                         $('note-input').value = subdivision.note || track.defaults.note;
                         $('octave-input').value = subdivision.octave || track.defaults.octave || 3;
                         $('scale-input').value = subdivision.scale || track.defaults.scale || 4095;
+                        $('sustain-input').value = subdivision.sustain || track.defaults.sustain || (this.player.bar / track.pattern.length / subdivisionInfo.subdivideCount).toFixed(2);
+
                     } else if (subdivision.subdivide && subdivision.pattern) {
                         // Subdivision container - find first active step
                         const firstActiveStep = this.getFirstActiveStepInPattern(subdivision.pattern);
@@ -961,12 +1026,16 @@ class DataSequencer {
                             $('note-input').value = firstActiveStep.note || track.defaults.note;
                             $('octave-input').value = firstActiveStep.octave || track.defaults.octave || 3;
                             $('scale-input').value = firstActiveStep.scale || track.defaults.scale || 4095;
+                            $('sustain-input').value = firstActiveStep.sustain || track.defaults.sustain || (this.player.bar / track.pattern.length / subdivisionInfo.subdivideCount).toFixed(2);
+
                         } else {
                             // No active steps, use track defaults
                             $('pitch-input').value = track.defaults.pitch || 0;
                             $('note-input').value = track.defaults.note || 36;
                             $('octave-input').value = track.defaults.octave || 3;
                             $('scale-input').value = track.defaults.scale || 4095;
+                            $('sustain-input').value = track.defaults.sustain || (this.player.bar / track.pattern.length / subdivisionInfo.subdivideCount).toFixed(2);
+
                         }
                     }
                 }
@@ -974,12 +1043,13 @@ class DataSequencer {
 
             case 'subdivision-steps':
                 firstStep = this.getFirstSelectedSubdivisionStep();
-                track = this.currentSection.tracks[this.selection.trackIndex];
+
                 if (firstStep) {
                     $('pitch-input').value = firstStep.pitch || 0;
                     $('note-input').value = firstStep.note || track.defaults.note;
                     $('octave-input').value = firstStep.octave || track.defaults.octave || 3;
                     $('scale-input').value = firstStep.scale || track.defaults.scale || 4095;
+                    $('sustain-input').value = firstStep.sustain || track.defaults.sustain || (this.player.bar / track.pattern.length / subdivisionInfo.subdivideCount).toFixed(2);
                 }
                 break;
         }
@@ -1076,7 +1146,7 @@ class DataSequencer {
         // Play note preview if activating and player is stopped
         if (shouldActivate && targetVelocity !== undefined && !this.player.isPlaying) {
             const note = clickedStep.note || track.defaults.note;
-            const channel = clickedStep.channel || track.defaults.channel || 9;
+            const channel = clickedStep.channel || track.defaults.channel || 10;
             this.playNotePreview(note, channel - 1, targetVelocity);
         }
 
@@ -1119,10 +1189,11 @@ class DataSequencer {
         let previewNote = null;
         let previewChannel = null;
         let previewVelocity = null;
+        const track = this.currentSection.tracks[this.selection.trackIndex];
 
         switch (this.selection.type) {
             case 'track':
-                const track = this.currentSection.tracks[this.selection.trackIndex];
+
                 const currentVelocity = track.defaults.velocity || 100;
                 const newVelocity = Math.max(1, Math.min(127, currentVelocity + velocityChange));
 
@@ -1130,7 +1201,7 @@ class DataSequencer {
 
                 // Set preview for track
                 previewNote = track.defaults.note;
-                previewChannel = track.defaults.channel || 9;
+                previewChannel = track.defaults.channel || 10;
                 previewVelocity = newVelocity;
 
                 // Update any existing explicit velocity values in the track
@@ -1160,7 +1231,6 @@ class DataSequencer {
                     // Apply to all selected steps without preview
                     this.selection.stepIndices.forEach(stepIndex => {
                         const step = this.currentSection.tracks[this.selection.trackIndex].pattern[stepIndex];
-                        const track = this.currentSection.tracks[this.selection.trackIndex];
 
                         if (step && step.type === 'step') {
                             const currentStepVelocity = step.velocity || track.defaults.velocity || 100;
@@ -1284,6 +1354,7 @@ class DataSequencer {
 
         return null;
     }
+
     changePitchSelectionIndividually(direction) {
         if (this.selection.type === 'none') return;
 
@@ -1316,7 +1387,7 @@ class DataSequencer {
 
                 // Set preview
                 previewNote = track.defaults.note;
-                previewChannel = track.defaults.channel || 9;
+                previewChannel = track.defaults.channel || 10;
 
                 this.changePitchInTrackExplicitValues(track, direction);
                 break;
@@ -1714,41 +1785,9 @@ class DataSequencer {
         }
 
         // Get channel
-        channel = step.channel || track.defaults.channel || 9;
+        channel = step.channel || track.defaults.channel || 10;
 
         return { note, channel };
-    }
-
-
-
-    changePitchSelection(direction) {
-        if (this.selection.type === 'none') return;
-
-        const currentPitch = parseInt($('pitch-input').value) || 0;
-        const currentOctave = parseInt($('octave-input').value) || 3;
-        const currentScale = parseInt($('scale-input').value) || 4095;
-
-        let newPitch = currentPitch + direction;
-        let newOctave = currentOctave;
-
-        const scaleNotes = numberToScale(currentScale);
-
-        if (newPitch >= scaleNotes.length) {
-            newPitch = 0;
-            newOctave = Math.min(10, newOctave + 1);
-        } else if (newPitch < 0) {
-            newPitch = scaleNotes.length - 1;
-            newOctave = Math.max(0, newOctave - 1);
-        }
-
-        const note = noteFromPitchOctaveScale(newPitch, newOctave, currentScale);
-
-        $('pitch-input').value = newPitch;
-        $('octave-input').value = newOctave;
-        $('note-input').value = note;
-
-        this.applyNote();
-        this.updateContextMenu();
     }
 
     updatePitchOctaveFromNote(note, scale = 4095) {
@@ -2159,8 +2198,86 @@ class DataSequencer {
         });
     }
 
+    // TODO: Use this?
+    adjustTrackLength(trackIndex, newResolution) {
+
+    const track = this.currentSection.tracks[trackIndex];
+    if (!track || newResolution === track.pattern.length) {
+        return;
+    }
+
+    // --- Stage 1: Get all active notes and determine their "Ideal Time" ---
+
+    //const allFlattenedSteps = this.player.trackStates[trackIndex].flatSteps;
+    const allFlattenedSteps = this.player.flattenPattern(track.pattern);
+    const timedActiveEvents = allFlattenedSteps.filter(step => step.fire !== 0);
+    const barDuration = this.player.bar;
+
+    // This array will hold the final, stateful step data and the ideal time to use for placement.
+    const eventsToPlace = timedActiveEvents.map(event => {
+        // Get the original step data, stripping temporary timing info.
+        const { startTime, endTime, duration, ...stepData } = event;
+
+        let idealTime;
+        // THE CRITICAL LOGIC: Check if this step already has a perfect time saved on it.
+        if (stepData.idealTime !== undefined) {
+            // If it does, USE IT. This prevents any drift.
+            idealTime = stepData.idealTime;
+        } else {
+            // If not, this is the first time we've adjusted this note.
+            // Calculate its ideal time based on its center position...
+            const centerTime = startTime + (duration / 2);
+            idealTime = centerTime / barDuration;
+            // ...and SAVE IT back to the step object for all future operations.
+            stepData.idealTime = idealTime;
+        }
+
+        return { step: stepData, idealTime: idealTime };
+    });
+
+    // --- Stage 2: Place the events into the new grid based on their ideal time ---
+
+    const newPattern = Array.from({ length: newResolution }, () => ({ type: "step", fire: 0 }));
+
+    eventsToPlace.forEach(event => {
+        // Calculate the target slot in the new grid.
+        let targetIndex = Math.floor(event.idealTime * newResolution);
+        targetIndex = Math.min(newResolution - 1, Math.max(0, targetIndex));
+
+        const existingStep = newPattern[targetIndex];
+        const isSlotEmpty = Object.keys(existingStep).length <= 2 && existingStep.fire === 0;
+
+        if (isSlotEmpty) {
+            newPattern[targetIndex] = event.step;
+        } else {
+            // Handle collisions by creating or adding to a subdivision.
+            if (existingStep.type === "subdivision") {
+                existingStep.pattern.push(event.step);
+            } else {
+                const newSubdivision = {
+                    type: "subdivision",
+                    span: 1,
+                    pattern: [existingStep, event.step]
+                };
+                newPattern[targetIndex] = newSubdivision;
+            }
+        }
+    });
+
+    // --- Stage 3: Final Polish ---
+    newPattern.forEach(step => {
+        if (step.type === "subdivision") {
+            // Sort the subdivision based on the stored idealTime of each note.
+            step.pattern.sort((a, b) => (a.idealTime || 0) - (b.idealTime || 0));
+            step.subdivide = step.pattern.length;
+        }
+    });
+
+    // --- Final Stage: Replace the old pattern ---
+    track.pattern = newPattern;
+}
     // Simple track length adjustment (no preservation)
-    adjustTrackLength(trackIndex, newLength) {
+    adjustTrackLengthOld(trackIndex, newLength) {
         const track = this.currentSection.tracks[trackIndex];
         const currentLength = track.pattern.length;
 
@@ -2284,28 +2401,15 @@ class DataSequencer {
     }
 
     addNewTrack() {
-        const newTrack = {
-            name: `Track ${this.currentSection.tracks.length + 1}`,
-            defaults: {
-                note: 36,
-                channel: 9,
-                velocity: 100  // Add velocity default
-            },
-            playback: { muted: false },
-            pattern: [
-                { type: "step", fire: 0 },
-                { type: "step", fire: 0 },
-                { type: "step", fire: 0 },
-                { type: "step", fire: 0 }
-            ],
-            operations: { euclidean: { steps: 4, pulses: 1 }, rotate: 0 },
-            layout: { minimized: false }
-        };
+
+        const newTrack = this.newEmptyTrack(this.sectionMaxSteps);
+        newTrack.name = `Track ${this.currentSection.tracks.length + 1}`;
 
         this.currentSection.tracks.push(newTrack);
         this.player.updateTrackStates();
         this.render("addNewTrack");
     }
+
     handleTrackControlInput(e) {
         const trackIndex = parseInt(e.target.dataset.track);
 
@@ -2322,10 +2426,7 @@ class DataSequencer {
             // Will be processed on blur or enter
             return;
         } else if (e.target.classList.contains('track-rotate-input')) {
-            const rotateValue = parseInt(e.target.value) || 1;
-            const track = this.currentSection.tracks[trackIndex];
-            if (!track.defaults) track.defaults = {};
-            track.defaults.rotate = Math.max(1, Math.min(32, rotateValue));
+            // Will be processed on blur or enter
             return;
         }
     }
@@ -2510,21 +2611,6 @@ class DataSequencer {
         this.currentSection.tracks.splice(trackIndex, 1);
         this.render("removeTrack");
         this.updateContextMenu();
-    }
-
-    adjustTrackLength(trackIndex, newLength) {
-        const track = this.currentSection.tracks[trackIndex];
-        const currentLength = track.pattern.length;
-
-        if (newLength > currentLength) {
-            // Extending track - add new default steps
-            for (let i = currentLength; i < newLength; i++) {
-                track.pattern.push({ type: "step", fire: 0 });
-            }
-        } else if (newLength < currentLength) {
-            // Shortening track - remove steps from end
-            track.pattern.splice(newLength);
-        }
     }
 
     cloneTrack(trackIndex) {
@@ -2841,7 +2927,6 @@ class DataSequencer {
 
         return displayIndex;
     }
-
     updateContextMenu() {
         // Update section display with track info
         this.updateSectionDisplay();
@@ -2858,69 +2943,70 @@ class DataSequencer {
         const noteInput = $('note-input');
         const channelInput = $('channel-input');
         const velocityInput = $('velocity-input');
+        const sustainInput = $('sustain-input');
         const modInput = $('mod-input');
         const stepVibeInput = $('step-vibe-input');
         const oddsInput = $('odds-input');
         const breakButton = $('break-subdivision-button');
         const subdivideButton = $('subdivide-button');
 
+        const track = this.currentSection.tracks[this.selection.trackIndex];
+
         breakButton.style.display = (this.selection.type === 'subdivision' ||
             this.selection.type === 'subdivision-steps') ? 'inline-block' : 'none';
 
         subdivideButton.style.display = (this.selection.type === 'track') ? 'none' : 'inline-block';
 
-        // Remove any playing section prefix logic - we only show the current section being edited
+        const subdivisionInfo = this.getSubdivisionInfo();
 
         switch (this.selection.type) {
             case 'track':
-                const track = this.currentSection.tracks[this.selection.trackIndex];
+
                 selectionTitleText.textContent = track.name;
                 noteInput.value = track.defaults.note;
                 channelInput.value = track.defaults.channel;
                 velocityInput.value = track.defaults.velocity || 100;
+                sustainInput.value = track.defaults.sustain || ((this.player.bar / track.pattern.length)).toFixed(2);
                 modInput.value = track.defaults.mod || '';
                 oddsInput.value = track.defaults.odds || '';
                 stepVibeInput.value = track.defaults.vibe || '';
-
 
                 // Update pitch/octave/scale controls
                 const trackScale = track.defaults.scale || 4095;
                 this.updatePitchOctaveFromNote(track.defaults.note, trackScale);
                 break;
 
-
             case 'steps':
                 const stepIndices = Array.from(this.selection.stepIndices).sort((a, b) => a - b);
                 const stepRangeText = stepIndices.length > 2 && this.isConsecutive(stepIndices)
                     ? `${stepIndices[0] + 1}-${stepIndices[stepIndices.length - 1] + 1}`
                     : stepIndices.map(i => i + 1).join(',');
-                const stepsTrackName = this.currentSection.tracks[this.selection.trackIndex].name;
+                const stepsTrackName = track.name;
                 selectionTitleText.textContent = `${stepsTrackName}: Step${stepIndices.length > 1 ? 's' : ''} ${stepRangeText}`;
 
                 const firstStep = this.getFirstSelectedStep();
                 if (firstStep) {
-                    const stepsTrack = this.currentSection.tracks[this.selection.trackIndex];
-                    noteInput.value = firstStep.note || stepsTrack.defaults.note;
-                    channelInput.value = firstStep.channel || stepsTrack.defaults.channel;
-                    velocityInput.value = firstStep.velocity || stepsTrack.defaults.velocity || 100;
+                    noteInput.value = firstStep.note || track.defaults.note;
+                    channelInput.value = firstStep.channel || track.defaults.channel;
+                    velocityInput.value = firstStep.velocity || track.defaults.velocity || 100;
+                    sustainInput.value = firstStep.sustain || track.defaults.sustain || ((this.player.bar / track.pattern.length)).toFixed(2);
                     modInput.value = firstStep.mod || '';
                     oddsInput.value = firstStep.odds || '';
                     stepVibeInput.value = firstStep.vibe || '';
 
                     // Update pitch/octave/scale controls
-                    const stepNote = firstStep.note || stepsTrack.defaults.note;
-                    const stepScale = firstStep.scale || stepsTrack.defaults.scale || 4095;
+                    const stepNote = firstStep.note || track.defaults.note;
+                    const stepScale = firstStep.scale || track.defaults.scale || 4095;
                     this.updatePitchOctaveFromNote(stepNote, stepScale);
                 }
                 break;
 
             case 'subdivision':
-                const subdivisionInfo = this.getSubdivisionInfo();
-                const subdivisionTrackName = this.currentSection.tracks[this.selection.trackIndex].name;
+                const subdivisionTrackName = track.name;
 
                 if (this.selection.subdivisionPath.length === 1) {
                     const stepIndex = this.selection.subdivisionPath[0];
-                    const subdivision = this.currentSection.tracks[this.selection.trackIndex].pattern[stepIndex];
+                    const subdivision = track.pattern[stepIndex];
                     const span = subdivision.span || 1;
                     const displayStartNumber = this.getDisplayStepNumber(this.selection.trackIndex, stepIndex);
 
@@ -2938,35 +3024,35 @@ class DataSequencer {
 
                 const subStep = this.getSelectedSubdivisionStep();
                 if (subStep && !subStep.subdivide) {
-                    const subTrack = this.currentSection.tracks[this.selection.trackIndex];
-                    noteInput.value = subStep.note || subTrack.defaults.note;
-                    channelInput.value = subStep.channel || subTrack.defaults.channel;
-                    velocityInput.value = subStep.velocity || subTrack.defaults.velocity || 100;
+                    noteInput.value = subStep.note || track.defaults.note;
+                    channelInput.value = subStep.channel || track.defaults.channel;
+                    velocityInput.value = subStep.velocity || track.defaults.velocity || 100;
+                    sustainInput.value = subStep.sustain || track.defaults.sustain || ((this.player.bar / track.pattern.length) / subdivisionInfo.subdivideCount).toFixed(2);
                     modInput.value = subStep.mod || '';
                     oddsInput.value = subStep.odds || '';
-                    stepVibeInput.value = track.defaults.vibe || '';
+                    stepVibeInput.value = subStep.vibe || '';
 
                     // Update pitch/octave/scale controls
-                    const subStepNote = subStep.note || subTrack.defaults.note;
-                    const subStepScale = subStep.scale || subTrack.defaults.scale || 4095;
+                    const subStepNote = subStep.note || track.defaults.note;
+                    const subStepScale = subStep.scale || track.defaults.scale || 4095;
                     this.updatePitchOctaveFromNote(subStepNote, subStepScale);
                 } else {
-                    const trackDefaults = this.currentSection.tracks[this.selection.trackIndex];
-                    noteInput.value = trackDefaults.defaults.note;
-                    channelInput.value = trackDefaults.defaults.channel;
-                    velocityInput.value = trackDefaults.defaults.velocity || 100;
-                    modInput.value = trackDefaults.defaults.mod || '';
-                    oddsInput.value = trackDefaults.defaults.odds || '';
+                    noteInput.value = track.defaults.note;
+                    channelInput.value = track.defaults.channel;
+                    velocityInput.value = track.defaults.velocity || 100;
+                    sustainInput.value = track.defaults.sustain || ((this.player.bar / track.pattern.length) / subdivisionInfo.subdivideCount).toFixed(2);
+                    modInput.value = track.defaults.mod || '';
+                    oddsInput.value = track.defaults.odds || '';
                     stepVibeInput.value = track.defaults.vibe || '';
 
                     // Update pitch/octave/scale controls
-                    const defaultScale = trackDefaults.defaults.scale || 4095;
-                    this.updatePitchOctaveFromNote(trackDefaults.defaults.note, defaultScale);
+                    const defaultScale = track.defaults.scale || 4095;
+                    this.updatePitchOctaveFromNote(track.defaults.note, defaultScale);
                 }
                 break;
 
             case 'subdivision-steps':
-                const subStepsTrackName = this.currentSection.tracks[this.selection.trackIndex].name;
+                const subStepsTrackName = track.name;
                 const subStepsPath = this.formatSubdivisionPath(this.selection.subdivisionPath.slice(0, -1));
                 const selectedSubSteps = Array.from(this.selection.subdivisionPath[this.selection.subdivisionPath.length - 1]).sort((a, b) => a - b);
                 const subStepRangeText = selectedSubSteps.length > 2 && this.isConsecutive(selectedSubSteps)
@@ -2975,27 +3061,28 @@ class DataSequencer {
                 selectionTitleText.textContent = `${subStepsTrackName}: ${subStepsPath}.${subStepRangeText}`;
                 const firstSubStep = this.getFirstSelectedSubdivisionStep();
                 if (firstSubStep) {
-                    const firstSubTrack = this.currentSection.tracks[this.selection.trackIndex];
-                    noteInput.value = firstSubStep.note || firstSubTrack.defaults.note;
-                    channelInput.value = firstSubStep.channel || firstSubTrack.defaults.channel;
-                    velocityInput.value = firstSubStep.velocity || firstSubTrack.defaults.velocity || 100;
+                    noteInput.value = firstSubStep.note || track.defaults.note;
+                    channelInput.value = firstSubStep.channel || track.defaults.channel;
+                    velocityInput.value = firstSubStep.velocity || track.defaults.velocity || 100;
+                    sustainInput.value = firstSubStep.sustain || track.defaults.sustain || ((this.player.bar / track.pattern.length) / subdivisionInfo.subdivideCount).toFixed(2);
                     modInput.value = firstSubStep.mod || '';
                     oddsInput.value = firstSubStep.odds || '';
-                    stepVibeInput.value = track.defaults.vibe || '';
+                    stepVibeInput.value = firstSubStep.vibe || '';
 
                     // Update pitch/octave/scale controls
-                    const subStepNote = firstSubStep.note || firstSubTrack.defaults.note;
-                    const subStepScale = firstSubStep.scale || firstSubTrack.defaults.scale || 4095;
+                    const subStepNote = firstSubStep.note || track.defaults.note;
+                    const subStepScale = firstSubStep.scale || track.defaults.scale || 4095;
                     this.updatePitchOctaveFromNote(subStepNote, subStepScale);
                 }
                 break;
 
             default:
-                // Show current section name instead of "No Selection"
+
                 selectionTitleText.textContent = this.currentSection.name;
                 noteInput.value = 36;
-                channelInput.value = 9;
+                channelInput.value = 10;
                 velocityInput.value = 100;
+                sustainInput.value = '';
                 modInput.value = '';
                 oddsInput.value = '';
                 stepVibeInput.value = '';
@@ -3003,6 +3090,85 @@ class DataSequencer {
                 // Update pitch/octave/scale controls to defaults
                 this.updatePitchOctaveFromNote(36, 4095);
         }
+    }
+
+    applyToSelection(property, value) {
+        let vibeMatrix = null;
+        if (property === 'vibe') {
+            vibeMatrix = new MarkovMatrix(value);
+            vibeMatrix.setRandomizer(this.player.randomGenerator);
+        }
+        switch (this.selection.type) {
+            case 'track':
+                if (property === 'note' || property === 'channel' || property === 'mod' || property === 'odds' || property === 'scale' || property === 'octave' || property === 'vibe' || property === 'sustain') {
+                    if (value === undefined) {
+                        console.log("DELETE ", property);
+                        delete this.currentSection.tracks[this.selection.trackIndex].defaults[property];
+                    } else {
+                        this.currentSection.tracks[this.selection.trackIndex].defaults[property] = value;
+                        if (property === 'vibe') this.currentSection.tracks[this.selection.trackIndex].defaults["vibeMatrix"] = vibeMatrix;
+                    }
+                    this.selectionChanged = true;
+                }
+                break;
+
+            case 'steps':
+                this.selection.stepIndices.forEach(stepIndex => {
+                    const step = this.currentSection.tracks[this.selection.trackIndex].pattern[stepIndex];
+                    if (step && step.type === 'step') {
+                        if (value === undefined) {
+                            delete step[property];
+                        } else {
+                            step[property] = value;
+                            if (property === 'vibe') step["vibeMatrix"] = vibeMatrix;
+                        }
+                        this.selectionChanged = true;
+                    }
+                });
+                break;
+
+            case 'subdivision':
+                const subStep = this.getSelectedSubdivisionStep();
+                if (subStep && subStep.type === 'step') {
+                    if (value === undefined) {
+                        delete subStep[property];
+                    } else {
+                        subStep[property] = value;
+                        if (property === 'vibe') subStep["vibeMatrix"] = vibeMatrix;
+                    }
+                    this.selectionChanged = true;
+                }
+                break;
+
+            case 'subdivision-steps':
+                if (this.selection.subdivisionPath && this.selection.subdivisionPath.length >= 2) {
+                    const pathWithoutSet = this.selection.subdivisionPath.slice(0, -1);
+                    const selectedSubSteps = this.selection.subdivisionPath[this.selection.subdivisionPath.length - 1];
+                    const subdivision = this.navigateToSubdivision(this.selection.trackIndex, pathWithoutSet);
+
+                    if (subdivision && subdivision.pattern) {
+                        selectedSubSteps.forEach(subIndex => {
+                            const subStep = subdivision.pattern[subIndex];
+                            if (subStep && subStep.type === 'step') {
+                                if (value === undefined) {
+                                    delete subStep[property];
+                                } else {
+                                    subStep[property] = value;
+                                    if (property === 'vibe') subStep["vibeMatrix"] = vibeMatrix;
+                                }
+                                this.selectionChanged = true;
+                            }
+                        });
+                    }
+                }
+                break;
+        }
+
+        // Only update track states when data actually changed
+        if (this.selectionChanged) {
+            this.player.updateTrackStates();
+        }
+        this.render("applyToSelection");
     }
 
     isConsecutive(numbers) {
@@ -3675,83 +3841,6 @@ class DataSequencer {
         }
     }
 
-    applyToSelection(property, value) {
-        let vibeMatrix = null;
-        if(property === 'vibe') {
-            vibeMatrix = new MarkovMatrix(value);
-            vibeMatrix.setRandomizer(this.player.randomGenerator);
-        }
-        switch (this.selection.type) {
-            case 'track':
-                if (property === 'note' || property === 'channel' || property === 'mod' || property === 'odds' || property === 'scale' || property === 'octave' || property === 'vibe') {
-                    if (value === undefined) {
-                        delete this.currentSection.tracks[this.selection.trackIndex].defaults[property];
-                    } else {
-                        this.currentSection.tracks[this.selection.trackIndex].defaults[property] = value;
-                        if(property === 'vibe') this.currentSection.tracks[this.selection.trackIndex].defaults["vibeMatrix"] = vibeMatrix;
-                    }
-                    this.selectionChanged = true;
-                }
-                break;
-
-            case 'steps':
-                this.selection.stepIndices.forEach(stepIndex => {
-                    const step = this.currentSection.tracks[this.selection.trackIndex].pattern[stepIndex];
-                    if (step && step.type === 'step') {
-                        if (value === undefined) {
-                            delete step[property];
-                        } else {
-                            step[property] = value;
-                            if(property === 'vibe') step["vibeMatrix"] = vibeMatrix;
-                        }
-                        this.selectionChanged = true;
-                    }
-                });
-                break;
-
-            case 'subdivision':
-                const subStep = this.getSelectedSubdivisionStep();
-                if (subStep && subStep.type === 'step') {
-                    if (value === undefined) {
-                        delete subStep[property];
-                    } else {
-                        subStep[property] = value;
-                        if(property === 'vibe') subStep["vibeMatrix"] = vibeMatrix;
-                    }
-                    this.selectionChanged = true;
-                }
-                break;
-
-            case 'subdivision-steps':
-                if (this.selection.subdivisionPath && this.selection.subdivisionPath.length >= 2) {
-                    const pathWithoutSet = this.selection.subdivisionPath.slice(0, -1);
-                    const selectedSubSteps = this.selection.subdivisionPath[this.selection.subdivisionPath.length - 1];
-                    const subdivision = this.navigateToSubdivision(this.selection.trackIndex, pathWithoutSet);
-
-                    if (subdivision && subdivision.pattern) {
-                        selectedSubSteps.forEach(subIndex => {
-                            const subStep = subdivision.pattern[subIndex];
-                            if (subStep && subStep.type === 'step') {
-                                if (value === undefined) {
-                                    delete subStep[property];
-                                } else {
-                                    subStep[property] = value;
-                                    if(property === 'vibe') subStep["vibeMatrix"] = vibeMatrix;
-                                }
-                                this.selectionChanged = true;
-                            }
-                        });
-                    }
-                }
-                break;
-        }
-
-        // Only update track states when data actually changed
-        if (this.selectionChanged) {
-            this.player.updateTrackStates();
-        }
-        this.render("applyToSelection");
-    }
     applyInverse() {
         if (this.selection.type === 'none') return;
         switch (this.selection.type) {
@@ -4012,44 +4101,6 @@ class DataSequencer {
         this.selection.stepIndices = new Set(newIndices);
         this.render("moveMultiStepSelection");
         this.updateContextMenu();
-    }
-
-    updateContextMenuInputsFromSelection() {
-        let firstStep = null;
-        let track = null;
-
-        switch (this.selection.type) {
-            case 'track':
-                track = this.currentSection.tracks[this.selection.trackIndex];
-                $('pitch-input').value = track.defaults.pitch || 0;
-                $('note-input').value = track.defaults.note || 36;
-                $('octave-input').value = track.defaults.octave || 3;
-                $('scale-input').value = track.defaults.scale || 4095;
-                break;
-
-            case 'steps':
-                firstStep = this.getFirstSelectedStep();
-                track = this.currentSection.tracks[this.selection.trackIndex];
-                if (firstStep) {
-                    $('pitch-input').value = firstStep.pitch || 0;
-                    $('note-input').value = firstStep.note || track.defaults.note;
-                    $('octave-input').value = firstStep.octave || track.defaults.octave || 3;
-                    $('scale-input').value = firstStep.scale || track.defaults.scale || 4095;
-                }
-                break;
-
-            case 'subdivision':
-            case 'subdivision-steps':
-                firstStep = this.getFirstSelectedSubdivisionStep() || this.getSelectedSubdivisionStep();
-                track = this.currentSection.tracks[this.selection.trackIndex];
-                if (firstStep) {
-                    $('pitch-input').value = firstStep.pitch || 0;
-                    $('note-input').value = firstStep.note || track.defaults.note;
-                    $('octave-input').value = firstStep.octave || track.defaults.octave || 3;
-                    $('scale-input').value = firstStep.scale || track.defaults.scale || 4095;
-                }
-                break;
-        }
     }
 
     getTotalTrackStepCount(trackIndex) {
@@ -4533,9 +4584,17 @@ class DataSequencer {
         }
     }
 
-    render(from="default") {
+    render(from = "default") {
         // For debugging:
         // console.log("Render:", from);
+
+            if(this.lastRender === "handleLengthChange" && from !== "handleLengthChange") {
+                // Remove idealTimes
+                this.player.cleanIdealTimes = true;
+            }
+        
+
+        this.lastRender = from;
 
         this.calculateMaxSteps();
 
@@ -4562,8 +4621,8 @@ class DataSequencer {
     }
 
     calculateMaxSteps() {
-        this.maxSteps = Math.max(...this.currentSection.tracks.map(track => this.getTrackDisplayLength(track)));
-        this.player.maxSteps = this.maxSteps; // Update player with new max steps   
+        this.sectionMaxSteps = Math.max(...this.currentSection.tracks.map(track => this.getTrackDisplayLength(track)));
+        this.player.maxSteps = this.sectionMaxSteps; // Update player with new max steps   
     }
 
     getTrackDisplayLength(track) {
@@ -4594,7 +4653,7 @@ class DataSequencer {
     }
 
     createIndexRow() {
-        const indexSteps = Array.from({ length: this.maxSteps }, (_, i) =>
+        const indexSteps = Array.from({ length: this.sectionMaxSteps }, (_, i) =>
             `<div class="index-step" id="index-${i}">${i + 1}</div>`
         ).join('');
 
@@ -4729,7 +4788,7 @@ class DataSequencer {
         }
     }
 
-createTrackSteps(track, trackIndex) {
+    createTrackSteps(track, trackIndex) {
         // Show different velocity modes based on track state
         const isMinimized = track.layout?.minimized;
         const showMelodyMode = this.isCurrentTabMelody() && !isMinimized;
@@ -4800,7 +4859,9 @@ createTrackSteps(track, trackIndex) {
             (step.channel && step.channel !== defaults.channel) ||
             step.mod ||
             step.odds ||
-            step.scale;
+            step.scale ||
+            step.vibe ||
+            step.sustain;
     }
 
     createSubdivisionHTML(subdivision, trackIndex, stepPath, level = 0) {
@@ -4916,7 +4977,7 @@ createTrackSteps(track, trackIndex) {
 
         // Export the complete data structure with all sections
         const completeData = {
-            sections: this.data  // Export all sections
+            sections: this.sections  // Export all sections
         };
 
         const formattedJson = this.formatJson(completeData);
@@ -5002,7 +5063,7 @@ createTrackSteps(track, trackIndex) {
     }
 
     // Import JSON data or ASCII notation
-   importData() {
+    importData() {
         const textarea = $('import-textarea');
         const statusDiv = $('import-status');
         const inputText = textarea.value.trim();
@@ -5043,24 +5104,21 @@ createTrackSteps(track, trackIndex) {
                 }
             }
 
-            if(newSection) {
-                this.currentSectionIndex = this.data.length - 1;
-                this.data.push(importedData.sections[0]);
+            if (newSection) {
+                this.currentSectionIndex = this.sections.length - 1;
+                this.sections.push(importedData.sections[0]);
             } else {
                 // Update the data
-                this.data = importedData.sections;
+                this.sections = importedData.sections;
                 this.player.sections = importedData.sections;
 
                 // Reset to first section
                 this.currentSectionIndex = 0;
-                this.currentSection = this.data[0];
+                this.currentSection = this.sections[0];
                 this.player.currentSectionIndex = 0;
-                this.player.currentSection = this.data[0];
+                this.player.currentSection = this.sections[0];
                 this.player.playingSectionIndex = 0;
             }
-
-
-            
 
             // Clear selection and reset following
             this.clearSelection();
@@ -5101,6 +5159,81 @@ createTrackSteps(track, trackIndex) {
         return asciiPattern.test(text);
     }
 
+    // NOT IN USE
+    extractMeaningfulSteps(pattern) {
+        const meaningfulSteps = [];
+        pattern.forEach(step => {
+            // A step is meaningful if it's a subdivision, is active, or has more than the default 2 keys ('type', 'fire').
+            if (step.subdivide || step.fire === 1 || Object.keys(step).length > 2) {
+                meaningfulSteps.push(JSON.parse(JSON.stringify(step))); // Deep copy to preserve
+            }
+        });
+        return meaningfulSteps;
+    }
+
+     // NOT IN USE
+    extractStepsWithIndices(pattern) {
+        const stepsWithIndices = [];
+        pattern.forEach((step, index) => {
+            // A step is meaningful if it's a subdivision, is active, or has custom properties.
+            if (step.subdivide || step.fire === 1 || Object.keys(step).length > 2) {
+                stepsWithIndices.push({
+                    step: JSON.parse(JSON.stringify(step)), // Deep copy
+                    originalIndex: index
+                });
+            }
+        });
+        return stepsWithIndices;
+    }
+
+     // NOT IN USE
+   extractPulseClusters(pattern, maxClusterGap = 2) {
+    if (!pattern || pattern.length === 0) {
+        return [];
+    }
+
+    const clusters = [];
+    let currentCluster = { steps: [] };
+    let lastMeaningfulIndex = -1;
+    let clusterStartIndex = -1;
+
+    pattern.forEach((step, index) => {
+        const isMeaningful = step.subdivide || step.fire === 1 || Object.keys(step).length > 2;
+
+        if (isMeaningful) {
+            // If a cluster is new or the gap is small enough, add to the current cluster.
+            if (currentCluster.steps.length === 0 || (index - lastMeaningfulIndex - 1) <= maxClusterGap) {
+                if (currentCluster.steps.length === 0) {
+                    clusterStartIndex = index;
+                }
+                const offset = index - clusterStartIndex;
+                currentCluster.steps.push({
+                    step: JSON.parse(JSON.stringify(step)),
+                    offset: offset
+                });
+            } else {
+                // Otherwise, the gap is too large. Finalize the old cluster and start a new one.
+                clusters.push(currentCluster);
+                clusterStartIndex = index;
+                currentCluster = {
+                    steps: [{
+                        step: JSON.parse(JSON.stringify(step)),
+                        offset: 0
+                    }]
+                };
+            }
+            lastMeaningfulIndex = index;
+        }
+    });
+
+    // Add the last cluster if it exists.
+    if (currentCluster.steps.length > 0) {
+        clusters.push(currentCluster);
+    }
+
+    return clusters;
+}
+
     // Export current section to ASCII notation
     exportToASCII(options = {}) {
         return this.asciiParser.exportToASCII({
@@ -5119,4 +5252,3 @@ createTrackSteps(track, trackIndex) {
 
 
 }
-

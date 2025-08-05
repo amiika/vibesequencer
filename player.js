@@ -22,6 +22,8 @@ class AudioWorkletPlayer {
         this.maxSteps = 0;
         this.sectionStartTime = 0; // Track when current section started
         this.onSectionChange = null; // Callback for when playback section changes
+        this.onStepChange = null; // Callback for step change
+        this.cleanIdealTimes = false;
         // TODO: Add as input
         this.randomSeed = 6545324874324;
         this.randomGenerator = new SeededRandom(this.randomSeed);
@@ -55,16 +57,9 @@ class AudioWorkletPlayer {
 
         // Update playback BPM
         const newBpm = playingSection.bpm || 120;
-        if (this.bpm !== newBpm) {
-            this.bpm = newBpm;
-            this.bar = 60 / this.bpm * this.beatsInBar;
-            this.barDuration = this.bar;
+        if(newBpm !== this.bpm) this.setTempo(newBpm);
 
-            if (this.clockNode) {
-                this.clockNode.port.postMessage({ type: 'setBPM', bpm: newBpm });
-            }
-        }
-
+        // Update track states
         this.updateTrackStates();
 
         // Update maxSteps for the new section
@@ -76,8 +71,24 @@ class AudioWorkletPlayer {
         }
     }
 
+    setTempo(newBpm) {
+        this.bpm = newBpm;
+        this.bar = 60 / this.bpm * this.beatsInBar;
+        this.barDuration = this.bar;
+
+        if (this.clockNode) {
+            this.clockNode.port.postMessage({ type: 'setBPM', bpm: newBpm });
+        }
+
+        console.log(`BPM updated to ${newBpm}`);
+    }
+
     setOnSectionChange(callback) {
         this.onSectionChange = callback;
+    }
+
+    setOnStepChange(callback) {
+        this.onStepChange = callback
     }
 
     // Method to check if current section should advance
@@ -100,6 +111,11 @@ class AudioWorkletPlayer {
         const walk = (stepsArr, stepDur) => {
             for (let i = 0; i < stepsArr.length; i++) {
                 const step = stepsArr[i];
+
+               if (this.cleanIdealTimes && step.idealTime !== undefined) {
+                    delete step.idealTime;
+                }
+
                 if (step.subdivide && step.pattern) {
                     const span = step.span || 1;
                     const subdivDur = stepDur * span / step.subdivide;
@@ -117,6 +133,7 @@ class AudioWorkletPlayer {
         };
 
         walk(pattern, timePerStep);
+        if(this.cleanIdealTimes) this.cleanIdealTimes = false;
         return steps;
     }
 
@@ -146,7 +163,7 @@ class AudioWorkletPlayer {
             }
 
             // Find the correct step index based on current pattern position
-            const correctStepIndex = flatSteps.findIndex(
+            let correctStepIndex = flatSteps.findIndex(
                 step => currentPatternPosition >= step.startTime && currentPatternPosition < step.endTime
             );
 
@@ -184,7 +201,7 @@ class AudioWorkletPlayer {
             this.startTime = now;
             this.sectionStartTime = now;
             this.currentLoop = 0;
-            this.playingSectionIndex = 0; // this.currentSectionIndex;
+            this.playingSectionIndex = 0;
             this.updateTrackStates();
             this.updatePlayhead(this.currentStep);
         } else {
@@ -203,9 +220,6 @@ class AudioWorkletPlayer {
             // Increment the repeat count first
             this.sectionRepeatCount++;
 
-
-            console.log("Section repeat count:", this.sectionRepeatCount, "Required repeats:", requiredRepeats);
-
             // Check if we've completed all required repeats
             if (this.sectionRepeatCount > 0 && this.sectionRepeatCount >= requiredRepeats) {
                 // We've completed all required repeats, advance to next section
@@ -213,8 +227,12 @@ class AudioWorkletPlayer {
                 this.sectionStartTime = now; // Reset section start time
                 this.sectionRepeatCount = 0;
             } else {
-                // Still have more repeats to go, reset timing for next repeat
-                this.sectionStartTime = now; // Reset section timing for next repeat
+                // Still have more repeats to go, reset timing and states for next repeat
+                this.sectionStartTime = now;
+                this.trackStates.forEach(state => {
+                    state.index = 0;
+                    state.hasFired = false;
+                });
             }
 
             // After section changes, recalculate pattern position for the new/continuing section
@@ -225,19 +243,21 @@ class AudioWorkletPlayer {
 
         const currentIndex = Math.floor(patternPosition / (this.bar / this.maxSteps));
 
+        // Update visual cue based on longest track
         if (this.currentStep !== currentIndex) {
             this.updatePlayhead(currentIndex);
             this.currentStep = currentIndex;
         }
 
-        // Use playing section for actual playback
+        this.fireSteps(patternPosition, now);
+    }
+
+    fireSteps(patternPosition, now) {
         const playingSection = this.sections[this.playingSectionIndex];
 
         this.trackStates.forEach((state, i) => {
             const track = playingSection.tracks[i];
             if (!track) return; // Safety check
-
-            let correctStepIndex = state.index;
 
             // Simple and clear: startTime + duration = end time
             const currentStep = state.flatSteps[state.index];
@@ -248,28 +268,27 @@ class AudioWorkletPlayer {
                 const defaults = track.defaults;
 
                 let lucky = true;
-                if((track.defaults && track.defaults.odds) || step.odds) {
+                if ((track.defaults && track.defaults.odds) || step.odds) {
                     const randomValue = this.randomGenerator.next();
                     const odds = step.odds || track.defaults.odds || 1.0;
-                    console.log(odds, randomValue);
-                    if( randomValue > odds) {
+                    if (randomValue > odds) {
                         lucky = false;
                     }
                 }
 
                 let modded = true;
-                if((track.defaults && track.defaults.mod) || step.mod) {
+                if ((track.defaults && track.defaults.mod) || step.mod) {
                     const mod = step.mod || track.defaults.mod || 1;
-                    if( this.currentLoop % mod !== 0) {
+                    if (this.currentLoop % mod !== 0) {
                         modded = false;
                     }
                 }
 
                 if (step && step.fire && !track.playback?.muted && lucky && modded) {
-                     
+
                     let note = step.note ?? defaults.note;
 
-                    if(step.vibeMatrix || defaults.vibeMatrix) {
+                    if (step.vibeMatrix || defaults.vibeMatrix) {
                         const vibe = step.vibeMatrix ?? defaults.vibeMatrix;
                         note = vibe.nextNote(step.octave ?? defaults.octave ?? 3, step.scale ?? defaults.scale ?? 4095);
                     }
@@ -282,20 +301,18 @@ class AudioWorkletPlayer {
                 }
 
                 state.hasFired = true;
-            } 
+            }
 
-             if (patternPosition >= currentStep.endTime) {
+            if (patternPosition >= currentStep.endTime) {
                 state.index++;
                 state.hasFired = false;
-                if (state.index >= state.flatSteps.length-1) {
+                if (state.index >= state.flatSteps.length) {
                     state.index = 0;
                 }
             }
 
- 
         });
     }
-
 
 
     playPreviewNote(note, channel, velocity = 100) {
@@ -349,7 +366,7 @@ class AudioWorkletPlayer {
         this.startTime = 0;
         this.sectionStartTime = 0;
         this.sectionRepeatCount = 0;
-        this.playingSectionIndex = 0; //this.currentSectionIndex;
+        this.playingSectionIndex = 0;
         this.updateTrackStates();
 
         this.clockNode.port.postMessage("start");
@@ -375,24 +392,6 @@ class AudioWorkletPlayer {
         this.updatePlayhead(0);
     }
 
-    setTempo(bpm) {
-        this.bpm = bpm;
-
-        // Update the BPM for the section that's currently being edited in the UI
-        if (this.sequencer && this.sequencer.currentSection) {
-            this.sequencer.currentSection.bpm = bpm;
-        }
-
-        this.bar = 60 / bpm * 4;
-        this.barDuration = this.bar / 4;
-
-        if (this.clockNode) {
-            this.clockNode.port.postMessage({ type: 'setBPM', bpm });
-        }
-
-        console.log(`Tempo changed to ${bpm} BPM`);
-    }
-
     setMuted(muted) {
         this.muted = muted;
     }
@@ -411,34 +410,9 @@ class AudioWorkletPlayer {
     }
 
     updatePlayhead(stepIndex) {
-        // Only show playhead if we have a sequencer reference and conditions are met
-        if (this.sequencer) {
-            // Show playhead only if:
-            // 1. User is following playback (normal case), OR
-            // 2. User is viewing the currently playing section (even if not following)
-            const shouldShowPlayhead = this.sequencer.isFollowingPlayback ||
-                (this.sequencer.currentSectionIndex === this.playingSectionIndex);
-
-            if (shouldShowPlayhead) {
-                document.querySelectorAll('.index-step').forEach((el, index) => {
-                    el.classList.toggle('current', index === stepIndex);
-                });
-            } else {
-                // Hide playhead when viewing different section and not following
-                document.querySelectorAll('.index-step').forEach((el) => {
-                    el.classList.remove('current');
-                });
-            }
-        } else {
-            // Fallback: always show if no sequencer reference
-            document.querySelectorAll('.index-step').forEach((el, index) => {
-                el.classList.toggle('current', index === stepIndex);
-            });
+        if (this.onStepChange) {
+            this.onStepChange(stepIndex, this.playingSectionIndex);
         }
-    }
-
-    setSequencer(sequencer) {
-        this.sequencer = sequencer;
     }
 
     getSectionInfo() {
@@ -452,5 +426,50 @@ class AudioWorkletPlayer {
             totalSections: this.sections.length,
             isPlaying: this.isPlaying
         };
+    }
+
+    forceSwitchToSection(newIndex) {
+        // This is called by the sequencer when the currently playing section is removed.
+        // It forces an immediate jump to a new section.
+
+        // Ensure the provided index is valid by wrapping it.
+        const clampedIndex = newIndex % this.sections.length;
+        this.playingSectionIndex = clampedIndex;
+
+        const playingSection = this.sections[this.playingSectionIndex];
+        if (!playingSection) {
+            console.error(`VibeSeq Error: Tried to switch to an invalid section index: ${clampedIndex}`);
+            this.stop();
+            return;
+        }
+
+        // Update playback BPM for the new section
+        const newBpm = playingSection.bpm || 120;
+        if (this.bpm !== newBpm) {
+            this.bpm = newBpm;
+            this.bar = 60 / this.bpm * this.beatsInBar;
+            this.barDuration = this.bar;
+
+            if (this.clockNode) {
+                this.clockNode.port.postMessage({ type: 'setBPM', bpm: newBpm });
+            }
+        }
+
+        // Reset section timing for a fresh start on the new section
+        if (this.isPlaying) {
+            this.sectionStartTime = this.audioContext.currentTime;
+        }
+        this.sectionRepeatCount = 0;
+
+        // Re-initialize track states for the new section's patterns
+        this.updateTrackStates();
+
+        // Update maxSteps for the new section
+        this.maxSteps = Math.max(...playingSection.tracks.map(track => this.calculatePatternLength(track.pattern)));
+
+        // Notify sequencer/UI of the change so it can follow if needed
+        if (this.onSectionChange) {
+            this.onSectionChange(this.playingSectionIndex);
+        }
     }
 }

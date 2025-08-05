@@ -143,9 +143,9 @@ button:hover {
 
 /* Playing section indicators */
 .section-tab.playing {
-    border: 2px solid rgb(78, 85, 70) !important;
     background: #345;
-    color: inherit;
+    border: 1px solid #567;
+    color: #aaa;
 }
 
 .section-tab.playing:hover {
@@ -155,15 +155,17 @@ button:hover {
 .section-tab.active.playing {
     background: #567 !important;
     color: #0af !important;
-    border: 2px solid #692 !important;
     border-bottom: 2px solid #0af !important;
 }
 
 .section-tab.playing .section-tab-name::before {
-    content: '▶ ';
-    color: rgb(87, 129, 32);
-    font-size: 10px;
-    margin-right: 4px;
+    position: absolute;
+    left: 0;
+    margin-left: 15px;
+    margin-top: 1px;
+    content: '▶';
+    color: rgb(109, 165, 36);
+    font-size: 12px;
 }
 
 .section-tab.playing .section-tab-close {
@@ -1146,7 +1148,12 @@ kbd {
 }
 
 .index-step.current {
-    background: #ff8;
+    background: #418a41;
+    color: #000;
+}
+
+.index-step.offsection {
+    background: rgb(99, 117, 136);
     color: #000;
 }
 
